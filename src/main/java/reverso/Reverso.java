@@ -17,7 +17,6 @@ public class Reverso {
 
     private static final String SYNONYM_URL = "https://synonyms.reverso.net/synonym/";
 
-
     public static SynonymResponse getSynonyms(SynonymLanguage language, String word) throws IOException {
 
         String URL = SYNONYM_URL + language.toString() + "/" + word;
@@ -50,4 +49,6 @@ public class Reverso {
         }
       return new SynonymResponse(true, language.toString(), word, synonymsMap);
     }
+
+
 }
