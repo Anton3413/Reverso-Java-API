@@ -1,22 +1,33 @@
 package reverso.supportedLanguages;
 
 public enum ContextLanguage {
-    ARABIC("ar"),
-    GERMAN("de"),
-    ENGLISH("en"),
-    SPANISH("es"),
-    FRENCH("fr"),
-    HEBREW("he"),
-    ITALIAN("it"),
-    JAPANESE("ja"),
-    KOREAN("ko"),
-    DUTCH("nl"),
-    POLISH("pl"),
-    PORTUGUESE("pt"),
-    ROMANIAN("ro"),
-    RUSSIAN("ru"),
-    SWEDISH,
-    TURKISH,
-    UKRAINIAN(),
-    CHINESE;
+    ARABIC("arabic"),
+    GERMAN("german"),
+    ENGLISH("english"),
+    SPANISH("spanish"),
+    FRENCH("french"),
+    HEBREW("hebrew"),
+    ITALIAN("italian"),
+    JAPANESE("japanese"),
+    KOREAN("korean"),
+    DUTCH("dutch"),
+    POLISH("polish"),
+    PORTUGUESE("portuguese"),
+    ROMANIAN("romanian"),
+    RUSSIAN("russian"),
+    SWEDISH("swedish"),
+    TURKISH("turkish"),
+    UKRAINIAN("ukrainian"),
+    CHINESE("chinese");
+
+    private final String name;
+
+
+    ContextLanguage(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return this.name;
+    }
 }

@@ -4,7 +4,10 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import reverso.data.ContextResponse;
+import reverso.data.Response;
 import reverso.data.SynonymResponse;
+import reverso.supportedLanguages.ContextLanguage;
 import reverso.supportedLanguages.SynonymLanguage;
 
 import java.io.IOException;
@@ -16,6 +19,7 @@ import java.util.Map;
 public class Reverso {
 
     private static final String SYNONYM_URL = "https://synonyms.reverso.net/synonym/";
+    private static final String CONTEXT_URL = "https://context.reverso.net/translation/";
 
     public static SynonymResponse getSynonyms(SynonymLanguage language, String word) throws IOException {
 
@@ -50,5 +54,22 @@ public class Reverso {
       return new SynonymResponse(true, language.toString(), word, synonymsMap);
     }
 
+    public static ContextResponse getContext(ContextLanguage sourceLanguage,
+                                             ContextLanguage targetLanguage, String word) throws IOException {
 
+        String URL = CONTEXT_URL + sourceLanguage.getName() + "-" + targetLanguage.getName() + "/" + word;
+
+        Document document = Jsoup.connect(URL).get();
+
+        Elements elements = document.select(".example");
+
+        Elements elements1 = elements.select("text");
+
+        for(Element element : elements) {
+            System.out.println(element.text());
+        }
+
+        return null;
+    }
 }
+
