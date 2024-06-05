@@ -57,18 +57,17 @@ public class Reverso {
     public static ContextResponse getContext(ContextLanguage sourceLanguage,
                                              ContextLanguage targetLanguage, String word) throws IOException {
 
+        Map<String,String> contextMap = new HashMap<>();
+
         String URL = CONTEXT_URL + sourceLanguage.getName() + "-" + targetLanguage.getName() + "/" + word;
 
         Document document = Jsoup.connect(URL).get();
 
         Elements elements = document.select(".example");
 
-        Elements elements1 = elements.select("text");
-
         for(Element element : elements) {
-            System.out.println(element.text());
+          contextMap.put(element.child(0).text(), element.child(1).text());
         }
-
         return null;
     }
 }
