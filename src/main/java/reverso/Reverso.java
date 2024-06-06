@@ -1,14 +1,18 @@
 package reverso;
 
+import com.google.gson.*;
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import reverso.data.ContextResponse;
-import reverso.data.Response;
-import reverso.data.SynonymResponse;
+import reverso.data.request.TranslationRequest;
+import reverso.data.response.ContextResponse;
+import reverso.data.response.SynonymResponse;
+import reverso.data.response.TranslateResponse;
 import reverso.supportedLanguages.ContextLanguage;
 import reverso.supportedLanguages.SynonymLanguage;
+import reverso.data.jsonParser.JsonParser;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,6 +24,7 @@ public class Reverso {
 
     private static final String SYNONYM_URL = "https://synonyms.reverso.net/synonym/";
     private static final String CONTEXT_URL = "https://context.reverso.net/translation/";
+    private static final String TRANSLATE_URL = "https://api.reverso.net/translate/v1/translation";
 
     public static SynonymResponse getSynonyms(SynonymLanguage language, String word) throws IOException {
 
@@ -55,20 +60,51 @@ public class Reverso {
     }
 
     public static ContextResponse getContext(ContextLanguage sourceLanguage,
-                                             ContextLanguage targetLanguage, String word) throws IOException {
+                                             ContextLanguage targetLanguage, String word)  {
 
         Map<String,String> contextMap = new HashMap<>();
 
         String URL = CONTEXT_URL + sourceLanguage.getName() + "-" + targetLanguage.getName() + "/" + word;
 
-        Document document = Jsoup.connect(URL).get();
+        Document document ;
+        try {
+            document = Jsoup.connect(URL).get();
+        } catch (IOException e) {
+            return new ContextResponse(false);
+        }
 
         Elements elements = document.select(".example");
 
         for(Element element : elements) {
           contextMap.put(element.child(0).text(), element.child(1).text());
         }
-        return null;
+        if(contextMap.isEmpty()){
+            return new ContextResponse(false);
+        }
+        return new ContextResponse(true, sourceLanguage.toString(),targetLanguage.toString(), contextMap);
+    }
+
+    public static TranslateResponse getTranslations(SynonymLanguage  sourceLanguage, SynonymLanguage targetLanguage,
+                                                    String text) throws IOException {
+
+        TranslationRequest request = new TranslationRequest(sourceLanguage.toString(), targetLanguage.toString(), text);
+
+        Connection.Response response = Jsoup.connect(TRANSLATE_URL)
+                .header("Content-Type", "application/json")
+                .requestBody(new Gson().toJson(request))
+                .method(Connection.Method.POST)
+                .ignoreContentType(true)
+                .execute();
+
+        String requestResult = response.body();
+
+        Map <String,String> contextTranslations = JsonParser.getContextTranslations(requestResult);
+
+        System.out.println(requestResult);
+        TranslateResponse translateResponse = new Gson().fromJson(requestResult, TranslateResponse.class);
+        translateResponse.setContextTranslations(contextTranslations);
+
+        return translateResponse;
     }
 }
 

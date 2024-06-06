@@ -1,14 +1,17 @@
-package reverso.data;
+package reverso.data.response;
 
-import java.util.List;
-import java.util.Map;
+import com.google.gson.annotations.JsonAdapter;
+import com.google.gson.annotations.SerializedName;
+import reverso.data.jsonParser.FromStringToArrayDeserializer;
 
 public abstract class Response {
 
     private boolean isOK;
+    @SerializedName("from")
     private String sourceLanguage;
-    private String word;
-
+    @SerializedName("input")
+    @JsonAdapter(FromStringToArrayDeserializer.class)
+    private String text;
 
     public Response(boolean isOK) {
         this.isOK = isOK;
@@ -17,7 +20,7 @@ public abstract class Response {
     public Response(boolean isOK, String sourceLanguage, String word) {
         this.isOK = isOK;
         this.sourceLanguage = sourceLanguage;
-        this.word = word;
+        this.text = word;
     }
 
     public boolean isOK() {
@@ -37,10 +40,10 @@ public abstract class Response {
     }
 
     public String getWord() {
-        return word;
+        return text;
     }
 
     public void setWord(String word) {
-        this.word = word;
+        this.text = word;
     }
 }

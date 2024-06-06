@@ -1,6 +1,5 @@
-package reverso.data;
+package reverso.data.response;
 
-import java.util.List;
 import java.util.Map;
 
 public class ContextResponse extends Response {

@@ -1,4 +1,4 @@
-package reverso.data;
+package reverso.data.response;
 
 import java.util.List;
 import java.util.Map;
@@ -11,8 +11,8 @@ public class SynonymResponse extends Response {
         super(isOK);
     }
 
-    public SynonymResponse(boolean isOK, String sourceLanguage, String word, Map<String, List<String>> synonyms) {
-        super(isOK, sourceLanguage, word);
+    public SynonymResponse(boolean isOK, String sourceLanguage, String text, Map<String, List<String>> synonyms) {
+        super(isOK, sourceLanguage, text);
         this.synonyms = synonyms;
     }
     

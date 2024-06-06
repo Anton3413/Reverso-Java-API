@@ -1,8 +1,8 @@
 package reverso;
 
-import reverso.data.ContextResponse;
-import reverso.data.Response;
-import reverso.data.SynonymResponse;
+import reverso.data.response.ContextResponse;
+import reverso.data.response.SynonymResponse;
+import reverso.data.response.TranslateResponse;
 import reverso.supportedLanguages.ContextLanguage;
 import reverso.supportedLanguages.SynonymLanguage;
 
@@ -16,14 +16,21 @@ public class Main {
         System.out.println(response.isOK());
         System.out.println(response.getSynonyms());
 
+        ContextResponse response1 = Reverso.getContext(ContextLanguage.ENGLISH,ContextLanguage.GERMAN,"оитотот");
 
-        ContextResponse response1 = Reverso.getContext(ContextLanguage.ENGLISH,ContextLanguage.GERMAN,"hello");
+       /*for(Map.Entry<String,String> element : response1.getResults().entrySet()){
+           System.out.println(element.getKey() + " : " + element.getValue());
+       }*/
 
-       /* System.out.println(response1.isOK());
-        System.out.println(response1.getResults());
-*/
+        TranslateResponse translateResponse = Reverso.getTranslations(SynonymLanguage.ENGLISH, SynonymLanguage.RUSSIAN,
+                "probaply");
 
 
+            System.out.println(translateResponse.getSourceLanguage());
+            System.out.println(translateResponse.getWord());
+            System.out.println(translateResponse.getTargetLanguage());
+            System.out.println(translateResponse.getTranslatedText());
+            System.out.println(translateResponse.getContextTranslations());
 
     }
 }
