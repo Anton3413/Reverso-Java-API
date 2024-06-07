@@ -25,6 +25,7 @@ public class Reverso {
     private static final String SYNONYM_URL = "https://synonyms.reverso.net/synonym/";
     private static final String CONTEXT_URL = "https://context.reverso.net/translation/";
     private static final String TRANSLATE_URL = "https://api.reverso.net/translate/v1/translation";
+    private static final String VOICE_URL = "https://voice.reverso.net/RestPronunciation.svc/v1/output=json/GetVoiceStream/";
 
     public static SynonymResponse getSynonyms(SynonymLanguage language, String word) throws IOException {
 
@@ -105,6 +106,23 @@ public class Reverso {
         translateResponse.setContextTranslations(contextTranslations);
 
         return translateResponse;
+    }
+
+    public static String getVoiceStream(SynonymLanguage from , String text) throws IOException {
+
+        String url = "http://voice.reverso.net/RestPronunciation.svc/v1/output=json/GetVoiceFile/" +
+                "voiceName=Peter22k";
+
+        // Создание HTTP-запроса и получение ответа
+        Document doc = Jsoup.connect(url).ignoreContentType(true).get();
+
+        // Парсинг JSON из ответа
+        String json = doc.body().text();
+
+        // Вывод JSON для проверки
+        System.out.println(json);
+
+        return null;
     }
 }
 
