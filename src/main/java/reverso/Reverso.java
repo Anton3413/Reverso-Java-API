@@ -116,6 +116,7 @@ public class Reverso {
         // Создание HTTP-запроса и получение ответа
         Document doc = Jsoup.connect(url).ignoreContentType(true).get();
 
+        
         // Парсинг JSON из ответа
         String json = doc.body().text();
 
