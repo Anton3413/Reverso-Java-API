@@ -13,12 +13,13 @@ import reverso.data.response.TranslateResponse;
 import reverso.supportedLanguages.ContextLanguage;
 import reverso.supportedLanguages.SynonymLanguage;
 import reverso.data.jsonParser.JsonParser;
+import reverso.supportedLanguages.Voice;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.InputStream;
+import java.util.*;
 
 public class Reverso {
 
@@ -108,22 +109,56 @@ public class Reverso {
         return translateResponse;
     }
 
-    public static String getVoiceStream(SynonymLanguage from , String text) throws IOException {
+    public static byte[] getVoiceStream(Voice voice , String text) throws IOException {
 
-        String url = "http://voice.reverso.net/RestPronunciation.svc/v1/output=json/GetVoiceFile/" +
-                "voiceName=Peter22k";
 
-        // Создание HTTP-запроса и получение ответа
-        Document doc = Jsoup.connect(url).ignoreContentType(true).get();
+        String base64Text = Base64.getEncoder().encodeToString(text.getBytes());
+        String url = VOICE_URL +"voiceName=" + voice.getName() + "?voiceSpeed=80" +"&" +"inputText=" + base64Text ;
 
-        
-        // Парсинг JSON из ответа
-        String json = doc.body().text();
+            Connection.Response response = Jsoup.connect(url)
+                    .ignoreContentType(true)
+                    .execute();
 
-        // Вывод JSON для проверки
-        System.out.println(json);
+            byte[] audio = response.bodyAsBytes();
 
-        return null;
+        System.out.println(audio.length);
+            /*ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+            // Чтение данных из входного потока и запись в ByteArrayOutputStream
+            byte[] buffer = new byte[4096];
+            int bytesRead = -1;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                byteArrayOutputStream.write(buffer, 0, bytesRead);
+            }
+
+            // Закрытие потоков
+            inputStream.close();
+
+            // Преобразование ByteArrayOutputStream в массив байт
+            byte[] audioBytes = byteArrayOutputStream.toByteArray();
+
+            // Использование массива байт
+            System.out.println("Аудиофайл успешно сохранен в массив байт, размер: " + audioBytes.length + " байт.");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        return null;*/
+        return audio;
+        /*if (audio.length > 0) {
+            System.out.println("Аудиофайл успешно получен. Размер: " + audio.length + " байт.");
+
+            // Проверка сигнатуры MP3 (первые 2 байта: 0xFF, 0xFB)
+            if (audio.length > 2 && (audio[0] & 0xFF) == 0xFF && (audio[1] & 0xFF) == 0xFB) {
+                System.out.println("Файл, вероятно, является MP3 аудиофайлом.");
+            } else {
+                System.out.println("Файл не распознан как MP3 аудиофайл.");
+            }
+        } else {
+            System.out.println("Файл пустой или не содержит данных.");
+        }
+
+        return null;*/
     }
 }
 

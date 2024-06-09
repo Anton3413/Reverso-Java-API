@@ -5,11 +5,14 @@ import reverso.data.response.SynonymResponse;
 import reverso.data.response.TranslateResponse;
 import reverso.supportedLanguages.ContextLanguage;
 import reverso.supportedLanguages.SynonymLanguage;
+import reverso.supportedLanguages.Voice;
 
+import javax.sound.sampled.*;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, UnsupportedAudioFileException, LineUnavailableException, InterruptedException {
 
        SynonymResponse response = Reverso.getSynonyms(SynonymLanguage.ENGLISH,"asde");
 
@@ -33,6 +36,7 @@ public class Main {
             System.out.println(translateResponse.getContextTranslations());
 
 
-            Reverso.getVoiceStream(SynonymLanguage.ENGLISH,"hello");
+        byte[] audioBytes =     Reverso.getVoiceStream(Voice.BRITISH_GRAHAM,"hello");
+
     }
 }
