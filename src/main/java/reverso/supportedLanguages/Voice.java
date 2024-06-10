@@ -119,6 +119,7 @@ public enum Voice {
         Voice[] voices = Arrays.stream(Voice.values())
                 .filter(voice -> voice.getLanguage().contains("English") || voice.getLanguage().contains("British")).toArray(Voice[]::new);
 
+        System.out.println(Arrays.toString(voices));
         int randomIndex = ThreadLocalRandom.current().nextInt(voices.length);
         return voices[randomIndex];
     }

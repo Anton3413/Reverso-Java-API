@@ -15,10 +15,7 @@ import reverso.supportedLanguages.SynonymLanguage;
 import reverso.data.jsonParser.JsonParser;
 import reverso.supportedLanguages.Voice;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 
 public class Reverso {
@@ -110,55 +107,16 @@ public class Reverso {
     }
 
     public static byte[] getVoiceStream(Voice voice , String text) throws IOException {
-
-
         String base64Text = Base64.getEncoder().encodeToString(text.getBytes());
+
         String url = VOICE_URL +"voiceName=" + voice.getName() + "?voiceSpeed=80" +"&" +"inputText=" + base64Text ;
 
-            Connection.Response response = Jsoup.connect(url)
+        Connection.Response response = Jsoup.connect(url)
                     .ignoreContentType(true)
                     .execute();
 
-            byte[] audio = response.bodyAsBytes();
+        return response.bodyAsBytes();
 
-        System.out.println(audio.length);
-            /*ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
-            // Чтение данных из входного потока и запись в ByteArrayOutputStream
-            byte[] buffer = new byte[4096];
-            int bytesRead = -1;
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                byteArrayOutputStream.write(buffer, 0, bytesRead);
-            }
-
-            // Закрытие потоков
-            inputStream.close();
-
-            // Преобразование ByteArrayOutputStream в массив байт
-            byte[] audioBytes = byteArrayOutputStream.toByteArray();
-
-            // Использование массива байт
-            System.out.println("Аудиофайл успешно сохранен в массив байт, размер: " + audioBytes.length + " байт.");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-
-        return null;*/
-        return audio;
-        /*if (audio.length > 0) {
-            System.out.println("Аудиофайл успешно получен. Размер: " + audio.length + " байт.");
-
-            // Проверка сигнатуры MP3 (первые 2 байта: 0xFF, 0xFB)
-            if (audio.length > 2 && (audio[0] & 0xFF) == 0xFF && (audio[1] & 0xFF) == 0xFB) {
-                System.out.println("Файл, вероятно, является MP3 аудиофайлом.");
-            } else {
-                System.out.println("Файл не распознан как MP3 аудиофайл.");
-            }
-        } else {
-            System.out.println("Файл пустой или не содержит данных.");
-        }
-
-        return null;*/
     }
 }
 
