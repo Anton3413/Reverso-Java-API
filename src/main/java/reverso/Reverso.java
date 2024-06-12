@@ -118,5 +118,9 @@ public class Reverso {
         return response.bodyAsBytes();
 
     }
+
+    public static void getWordConjugation(ContextLanguage language, String word){
+
+    }
 }
 
