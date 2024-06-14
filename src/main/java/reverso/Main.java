@@ -30,5 +30,7 @@ public class Main {
             System.out.println(translateResponse.getTranslatedText());
             System.out.println(translateResponse.getContextTranslations());
 
+
+            Reverso.getWordConjugation(ContextLanguage.ENGLISH,"go");
         }
 }
