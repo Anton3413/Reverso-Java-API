@@ -2,31 +2,36 @@ package reverso;
 
 import com.google.gson.*;
 import org.jsoup.Connection;
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import reverso.data.request.TranslationRequest;
-import reverso.data.response.ContextResponse;
-import reverso.data.response.SynonymResponse;
-import reverso.data.response.TranslateResponse;
+import reverso.data.response.impl.*;
 import reverso.supportedLanguages.ContextLanguage;
 import reverso.supportedLanguages.SynonymLanguage;
 import reverso.data.jsonParser.JsonParser;
 import reverso.supportedLanguages.Voice;
 
 import java.io.*;
+import java.sql.SQLOutput;
 import java.util.*;
 
 public class Reverso {
 
+    private static Properties properties;
     private static final String SYNONYM_URL = "https://synonyms.reverso.net/synonym/";
     private static final String CONTEXT_URL = "https://context.reverso.net/translation/";
     private static final String TRANSLATE_URL = "https://api.reverso.net/translate/v1/translation";
     private static final String VOICE_URL = "https://voice.reverso.net/RestPronunciation.svc/v1/output=json/GetVoiceStream/";
     private static final String CONJUGATION_URL = "https://conjugator.reverso.net/conjugation";
 
-    public static SynonymResponse getSynonyms(SynonymLanguage language, String word) throws IOException {
+
+    static {
+        initializeProperties();
+    }
+    /*public static SynonymResponse getSynonyms(SynonymLanguage language, String word) throws IOException {
 
         String URL = SYNONYM_URL + language.toString() + "/" + word;
 
@@ -105,34 +110,58 @@ public class Reverso {
         translateResponse.setContextTranslations(contextTranslations);
 
         return translateResponse;
-    }
+    }*/
 
-    public static byte[] getVoiceStream(Voice voice, String text) throws IOException {
+    public static VoiceResponse getVoiceStream(Voice voice, String text) throws IOException {
+
         String base64Text = Base64.getEncoder().encodeToString(text.getBytes());
 
-        String url = VOICE_URL + "voiceName=" + voice.getName() + "?voiceSpeed=80" + "&" + "inputText=" + base64Text;
+        String requestURL = VOICE_URL + "voiceName=" + voice.getName() + "?voiceSpeed=80" + "&" + "inputText=" + base64Text;
 
-        Connection.Response response = Jsoup.connect(url)
-                .ignoreContentType(true)
-                .execute();
-
-        return response.bodyAsBytes();
-
+        Connection.Response response;
+        try {
+            response = Jsoup.connect(requestURL)
+                    .ignoreContentType(true)
+                    .ignoreHttpErrors(true)
+                    .execute();
+        } catch (IOException e) {
+            throw new IOException(properties.getProperty("message.error.connection"));
+        }
+        if(response.statusCode() == 404) {
+            String errorMessage = properties.getProperty("message.error.voiceStream.404");
+            return new VoiceResponse(false,errorMessage, voice.getLanguage(), text, voice.getName(), voice.getGender());
+        } else if (response.bodyAsBytes().length == 9358) {
+            String errorMessage = properties.getProperty("message.error.voiceStream.textTooLong");
+            return new VoiceResponse(false,errorMessage, voice.getLanguage(), text, voice.getName(), voice.getGender());
+        }
+        return new VoiceResponse(true, voice.getLanguage(), text, voice.getName(), voice.getGender(), response.bodyAsBytes());
     }
 
     public static void getWordConjugation(ContextLanguage language, String word) throws IOException {
 
         String URL = CONJUGATION_URL + "-" + language.toString() + "-" + "verb" + "-" + word + ".html";
 
-        Document document = Jsoup.connect(URL)
-                .ignoreContentType(true)
-                .execute()
-                .parse();
+        Document document = null;
+
+            Connection.Response response = Jsoup.connect(URL)
+                    .ignoreContentType(true)
+                    .ignoreHttpErrors(true)
+                    .execute();
+
+            if (response.statusCode() == 404) {
+                document = response.parse();
+                String errorMessage = document.getElementById("ch_lblCustomMessage")
+                        .text();
+            } else {
+                document = Jsoup.parse(response.body());
+            }
+
+
 
         Elements resultBlock = document.getElementsByClass("word-wrap-row");
 
         // Инициализируем мапу для хранения результатов
-        Map<String, String[]> resultMap = new HashMap<>();
+        Map<String, String[]> conjugationData = new HashMap<>();
 
         // Проходим по каждому элементу с классом "word-wrap-row"
         for (Element element : resultBlock) {
@@ -148,15 +177,25 @@ public class Reverso {
                                 .map(li -> li.getElementsByTag("i").text())
                                 .toArray(String[]::new);
                         // Добавляем ключ и массив текстов в мапу
-                        resultMap.put(key, liTexts);
+                        conjugationData.put(key, liTexts);
             }
         }
-        resultMap.forEach((key, value) -> {
+      /*  ConjugationResponse response = new ConjugationResponse(true,)*/
+
+        conjugationData.forEach((key, value) -> {
             System.out.println("Key: " + key);
             for (String text : value) {
                 System.out.println("  Value: " + text);
             }
         });
+    }
+     static private void initializeProperties(){
+        try {
+            properties = new Properties();
+            properties.load(Reverso.class.getResourceAsStream("/messages.properties"));
+        } catch (IOException e) {
+            throw new RuntimeException("Problem during properties file initialization. Possibly the path is incorrect");
+        }
     }
 }
 

@@ -1,10 +1,10 @@
-package reverso.data.response;
+package reverso.data.response.impl;
 
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 import reverso.data.jsonParser.FromStringToArrayDeserializer;
+import reverso.data.response.Response;
 
-import java.util.List;
 import java.util.Map;
 
 public class TranslateResponse extends Response {
@@ -19,8 +19,9 @@ public class TranslateResponse extends Response {
     @SerializedName("results")
     private Map<String,String> contextTranslations;
 
-    public TranslateResponse(boolean isOK) {
-        super(isOK);
+    public TranslateResponse(boolean isOK,String errorMessage, String sourceLanguage, String targetLanguage, String text) {
+        super(isOK,errorMessage,sourceLanguage,text);
+        this.targetLanguage = targetLanguage;
     }
 
     public TranslateResponse(boolean isOK, String sourceLanguage, String targetLanguage, String text, String translation,

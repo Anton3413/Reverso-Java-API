@@ -13,14 +13,20 @@ public abstract class Response {
     @JsonAdapter(FromStringToArrayDeserializer.class)
     private String text;
 
-    public Response(boolean isOK) {
+    private String errorMessage;
+
+    public Response(boolean isOK, String errorMessage, String sourceLanguage, String text) {
         this.isOK = isOK;
+        this.errorMessage = errorMessage;
+        this.sourceLanguage = sourceLanguage;
+        this.text = text;
     }
 
-    public Response(boolean isOK, String sourceLanguage, String word) {
+    public Response(boolean isOK, String sourceLanguage, String text) {
         this.isOK = isOK;
         this.sourceLanguage = sourceLanguage;
-        this.text = word;
+        this.text = text;
+        this.errorMessage=null;
     }
 
     public boolean isOK() {
@@ -31,19 +37,27 @@ public abstract class Response {
         isOK = OK;
     }
 
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
     public String getSourceLanguage() {
         return sourceLanguage;
     }
 
     public void setSourceLanguage(String sourceLanguage) {
         this.sourceLanguage = sourceLanguage;
-    }
-
-    public String getWord() {
-        return text;
-    }
-
-    public void setWord(String word) {
-        this.text = word;
     }
 }
