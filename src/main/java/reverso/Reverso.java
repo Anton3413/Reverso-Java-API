@@ -1,25 +1,18 @@
 package reverso;
 
-import com.google.gson.*;
 import org.jsoup.Connection;
-import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import reverso.data.request.TranslationRequest;
 import reverso.data.response.impl.*;
-import reverso.supportedLanguages.ContextLanguage;
-import reverso.supportedLanguages.SynonymLanguage;
-import reverso.data.jsonParser.JsonParser;
+import reverso.supportedLanguages.Language;
 import reverso.supportedLanguages.Voice;
 
 import java.io.*;
-import java.sql.SQLOutput;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Reverso {
-
     private static Properties properties;
     private static final String SYNONYM_URL = "https://synonyms.reverso.net/synonym/";
     private static final String CONTEXT_URL = "https://context.reverso.net/translation/";
@@ -27,42 +20,41 @@ public class Reverso {
     private static final String VOICE_URL = "https://voice.reverso.net/RestPronunciation.svc/v1/output=json/GetVoiceStream/";
     private static final String CONJUGATION_URL = "https://conjugator.reverso.net/conjugation";
 
-
     static {
         initializeProperties();
     }
-    /*public static SynonymResponse getSynonyms(SynonymLanguage language, String word) throws IOException {
-
-        String URL = SYNONYM_URL + language.toString() + "/" + word;
-
-        Document document = Jsoup.connect(URL).get();
-
-        Elements wrapHoldProps = document.select(".wrap-hold-prop");
-
-        if (wrapHoldProps.isEmpty()) {
-            return new SynonymResponse(false);
+    public static SynonymResponse getSynonyms(Language language, String word){
+        if(language.getShortName()==null){
+            String errorMessage = properties.getProperty("message.error.synonym.unSupportedLanguage");
+            return new SynonymResponse(false,errorMessage, language.getFullName(), word);
         }
+        String URL = SYNONYM_URL + language.getShortName() + "/" + word;
 
-        Map<String, List<String>> synonymsMap = new HashMap<>();
-
-        String partOfSpeech;
-        List<String> synonyms;
-        for (Element wrapHoldProp : wrapHoldProps) {
-
-            Element headerElement = wrapHoldProp.selectFirst("div[class^=words-options pos] > h2");
-            partOfSpeech = headerElement.text();
-
-            Element wordOpt = wrapHoldProp.selectFirst("div[class^=pannel cluster] > div.word-opt > ul");
-            Elements liElements = wordOpt.select("li");
-            synonyms = new ArrayList<>();
-            for (Element li : liElements) {
-                Element aTag = li.selectFirst("a");
-                synonyms.add(aTag.text());
-            }
-            synonymsMap.put(partOfSpeech, synonyms);
+        Connection.Response response;
+        Elements wrapHoldProps;
+        try {
+           response= Jsoup.connect(URL)
+                   .ignoreHttpErrors(true)
+                   .execute();
+            wrapHoldProps = response.parse().select(".wrap-hold-prop");
+        } catch (IOException e) {
+            String errorMessage = properties.getProperty("message.error.connection");
+            return new SynonymResponse(false,errorMessage, language.getFullName(), word);
         }
+        if(response.statusCode()==404){
+            String errorMessage = properties.getProperty("message.error.synonym.noResults");
+            return new SynonymResponse(false,errorMessage, language.getFullName(), word);
+        }
+        Map<String, List<String>> synonymsMap = wrapHoldProps.stream()
+                .collect(Collectors.toMap(
+                        wrapHoldProp -> wrapHoldProp.selectFirst("div[class^=words-options pos] > h2").text(),
+                        wrapHoldProp -> wrapHoldProp.selectFirst("div[class^=pannel cluster] > div.word-opt > ul")
+                                .select("li a").stream()
+                                .map(Element::text)
+                                .collect(Collectors.toList())
+                ));
         return new SynonymResponse(true, language.toString(), word, synonymsMap);
-    }
+    } /*
 
     public static ContextResponse getContext(ContextLanguage sourceLanguage,
                                              ContextLanguage targetLanguage, String word) {
@@ -112,7 +104,7 @@ public class Reverso {
         return translateResponse;
     }*/
 
-    public static VoiceResponse getVoiceStream(Voice voice, String text) throws IOException {
+    public static VoiceResponse getVoiceStream(Voice voice, String text) {
 
         String base64Text = Base64.getEncoder().encodeToString(text.getBytes());
 
@@ -125,7 +117,8 @@ public class Reverso {
                     .ignoreHttpErrors(true)
                     .execute();
         } catch (IOException e) {
-            throw new IOException(properties.getProperty("message.error.connection"));
+            String errorMessage = properties.getProperty("message.error.connection");
+            return new VoiceResponse(false,errorMessage, voice.getLanguage(), text, voice.getName(), voice.getGender());
         }
         if(response.statusCode() == 404) {
             String errorMessage = properties.getProperty("message.error.voiceStream.404");
@@ -137,7 +130,7 @@ public class Reverso {
         return new VoiceResponse(true, voice.getLanguage(), text, voice.getName(), voice.getGender(), response.bodyAsBytes());
     }
 
-    public static void getWordConjugation(ContextLanguage language, String word) throws IOException {
+    /*public static void getWordConjugation(ContextLanguage language, String word) throws IOException {
 
         String URL = CONJUGATION_URL + "-" + language.toString() + "-" + "verb" + "-" + word + ".html";
 
@@ -180,7 +173,7 @@ public class Reverso {
                         conjugationData.put(key, liTexts);
             }
         }
-      /*  ConjugationResponse response = new ConjugationResponse(true,)*/
+      *//*  ConjugationResponse response = new ConjugationResponse(true,)*//*
 
         conjugationData.forEach((key, value) -> {
             System.out.println("Key: " + key);
@@ -188,7 +181,7 @@ public class Reverso {
                 System.out.println("  Value: " + text);
             }
         });
-    }
+    }*/
      static private void initializeProperties(){
         try {
             properties = new Properties();
