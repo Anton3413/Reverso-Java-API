@@ -1,10 +1,12 @@
 package reverso.data.response.impl;
 
+import com.google.gson.Gson;
 import reverso.data.response.Response;
+import reverso.data.response.Response1;
 
 import java.util.Map;
 
-public class VoiceResponse extends Response {
+public class VoiceResponse extends Response1 {
 
     private String voiceName;
     private String voiceGender;
@@ -49,4 +51,5 @@ public class VoiceResponse extends Response {
     public void setMp3Data(byte[] mp3Data) {
         this.mp3Data = mp3Data;
     }
+
 }
