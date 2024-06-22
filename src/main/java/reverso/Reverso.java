@@ -23,11 +23,8 @@ public class Reverso {
     static {
         initializeProperties();
     }
-    public static SynonymResponse getSynonyms(Language language, String word,){
 
-    }
-
-    public static SynonymResponse getSynonyms(Language language, String word, int maxSize){
+    public static SynonymResponse getSynonyms(Language language, String word){
         if(language.getShortName()==null){
             String errorMessage = properties.getProperty("message.error.synonym.unSupportedLanguage");
             return new SynonymResponse(false,errorMessage, language.getFullName(), word);
