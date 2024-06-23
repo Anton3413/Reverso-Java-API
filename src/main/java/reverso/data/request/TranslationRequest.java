@@ -1,5 +1,6 @@
 package reverso.data.request;
 
+import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,5 +36,8 @@ public class TranslationRequest {
                 ", format='" + format + '\'' +
                 ", options=" + options +
                 '}';
+    }
+    public String getAsJson(){
+        return new Gson().toJson(this);
     }
 }

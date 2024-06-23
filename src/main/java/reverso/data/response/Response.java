@@ -1,16 +1,12 @@
 package reverso.data.response;
 
-import com.google.gson.annotations.JsonAdapter;
-import com.google.gson.annotations.SerializedName;
-import reverso.data.jsonParser.FromStringToArrayDeserializer;
 
 public abstract class Response {
 
     private boolean isOK;
-    @SerializedName("from")
+
     private String sourceLanguage;
-    @SerializedName("input")
-    @JsonAdapter(FromStringToArrayDeserializer.class)
+
     private String text;
 
     private String errorMessage;
@@ -59,5 +55,15 @@ public abstract class Response {
 
     public void setSourceLanguage(String sourceLanguage) {
         this.sourceLanguage = sourceLanguage;
+    }
+
+    @Override
+    public String toString() {
+        return "{\n" +
+                "  \"isOK\": " + isOK + ",\n" +
+                "  \"sourceLanguage\": \"" + sourceLanguage + "\",\n" +
+                "  \"text\": \"" + text + "\",\n" +
+                "  \"errorMessage\": \"" + errorMessage + "\"\n" +
+                "}";
     }
 }

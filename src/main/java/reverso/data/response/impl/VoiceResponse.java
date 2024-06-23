@@ -1,12 +1,10 @@
 package reverso.data.response.impl;
 
-import com.google.gson.Gson;
 import reverso.data.response.Response;
-import reverso.data.response.Response1;
 
-import java.util.Map;
+import java.util.Base64;
 
-public class VoiceResponse extends Response1 {
+public class VoiceResponse extends Response {
 
     private String voiceName;
     private String voiceGender;
@@ -26,6 +24,13 @@ public class VoiceResponse extends Response1 {
         this.voiceName = voiceName;
         this.voiceGender = voiceGender;
         this.mp3Data = mp3Data;
+    }
+
+    public String getDataAsBase64() {
+        if(mp3Data == null) {
+            throw new NullPointerException("mp3Data is null");
+        }
+        return Base64.getEncoder().encodeToString(mp3Data);
     }
 
     public String getVoiceName() {
@@ -50,6 +55,19 @@ public class VoiceResponse extends Response1 {
 
     public void setMp3Data(byte[] mp3Data) {
         this.mp3Data = mp3Data;
+    }
+
+    @Override
+    public String toString() {
+        return "{\n" +
+                "  \"isOK\": " + isOK() + ",\n" +
+                "  \"sourceLanguage\": \"" + getSourceLanguage() + "\",\n" +
+                "  \"text\": \"" + getText() + "\",\n" +
+                "  \"errorMessage\": \"" + getErrorMessage() + "\",\n" +
+                "  \"voiceName\": \"" + voiceName + "\",\n" +
+                "  \"voiceGender\": \"" + voiceGender + "\",\n" +
+                "  \"mp3DataBase64\": \"" + (mp3Data!=null) + "\"\n" +
+                "}";
     }
 
 }

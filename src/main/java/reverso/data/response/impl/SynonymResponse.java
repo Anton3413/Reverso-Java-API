@@ -25,4 +25,15 @@ public class SynonymResponse extends Response {
     public void setSynonyms(Map<String, List<String>> synonyms) {
         this.synonyms = synonyms;
     }
+
+    @Override
+    public String toString() {
+        return "{\n" +
+                "  \"isOK\": " + isOK() + ",\n" +
+                "  \"sourceLanguage\": \"" + getSourceLanguage() + "\",\n" +
+                "  \"text\": \"" + getText() + "\",\n" +
+                "  \"errorMessage\": \"" + getErrorMessage() + "\",\n" +
+                "  \"synonyms\": " + synonyms + "\n" +
+                "}";
+    }
 }

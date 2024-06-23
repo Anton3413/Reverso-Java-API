@@ -1,9 +1,13 @@
 package reverso;
 
+import com.google.gson.Gson;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import reverso.data.jsonParser.JsonParser;
+import reverso.data.request.TranslationRequest;
 import reverso.data.response.impl.*;
 import reverso.supportedLanguages.Language;
 import reverso.supportedLanguages.Voice;
@@ -25,11 +29,11 @@ public class Reverso {
     }
 
     public static SynonymResponse getSynonyms(Language language, String word){
-        if(language.getShortName()==null){
+        if(language.getSynonymName()==null){
             String errorMessage = properties.getProperty("message.error.synonym.unSupportedLanguage");
             return new SynonymResponse(false,errorMessage, language.getFullName(), word);
         }
-        String URL = SYNONYM_URL + language.getShortName() + "/" + word;
+        String URL = SYNONYM_URL + language.getSynonymName() + "/" + word;
 
         Connection.Response response;
         Elements wrapHoldProps;
@@ -54,7 +58,7 @@ public class Reverso {
                                 .map(Element::text)
                                 .collect(Collectors.toList())
                 ));
-        return new SynonymResponse(true, language.toString(), word, synonymsMap);
+        return new SynonymResponse(true, language.getFullName(), word, synonymsMap);
     } /*
 
     public static ContextResponse getContext(ContextLanguage sourceLanguage,
@@ -80,30 +84,39 @@ public class Reverso {
             return new ContextResponse(false);
         }
         return new ContextResponse(true, sourceLanguage.toString(), targetLanguage.toString(), contextMap);
-    }
+    } */
+    public static TranslateResponse getTranslations(Language sourceLanguage, Language targetLanguage, String text) {
 
-    public static TranslateResponse getTranslations(SynonymLanguage sourceLanguage, SynonymLanguage targetLanguage,
-                                                    String text) throws IOException {
+        TranslationRequest request = new TranslationRequest(sourceLanguage.getSynonymName(), targetLanguage.getSynonymName(), text);
 
-        TranslationRequest request = new TranslationRequest(sourceLanguage.toString(), targetLanguage.toString(), text);
+        TranslateResponse translateResponse = new TranslateResponse(false,"text",sourceLanguage.getFullName(),
+                targetLanguage.getFullName(), text);
 
-        Connection.Response response = Jsoup.connect(TRANSLATE_URL)
-                .header("Content-Type", "application/json")
-                .requestBody(new Gson().toJson(request))
-                .method(Connection.Method.POST)
-                .ignoreContentType(true)
-                .execute();
+        Connection.Response response;
+        try {
+            response = Jsoup.connect(TRANSLATE_URL)
+                    .header("Content-Type", "application/json")
+                    .requestBody(request.getAsJson())
+                    .method(Connection.Method.POST)
+                    .ignoreContentType(true)
+                    .execute();
+        } catch (IOException e) {
+            translateResponse.setErrorMessage(properties.getProperty("message.error.connection"));
+            return translateResponse;
+        }
 
         String requestResult = response.body();
 
+        System.out.println(requestResult);
         Map<String, String> contextTranslations = JsonParser.getContextTranslations(requestResult);
 
-        System.out.println(requestResult);
         TranslateResponse translateResponse = new Gson().fromJson(requestResult, TranslateResponse.class);
         translateResponse.setContextTranslations(contextTranslations);
 
-        return translateResponse;
-    }*/
+        System.out.println(translateResponse);
+        return null;
+    }
+
 
     public static VoiceResponse getVoiceStream(Voice voice, String text) {
 
