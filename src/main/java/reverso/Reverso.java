@@ -2,6 +2,7 @@ package reverso;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import reverso.data.jsonParser.JSONParser;
@@ -10,7 +11,8 @@ import reverso.data.response.impl.*;
 import reverso.supportedLanguages.Language;
 import reverso.supportedLanguages.Voice;
 
-import java.io.*;
+
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -57,32 +59,44 @@ public class Reverso {
                                 .collect(Collectors.toList())
                 ));
         return new SynonymResponse(true, language.getFullName(), word, synonymsMap);
-    } /*
+    }
 
-    public static ContextResponse getContext(ContextLanguage sourceLanguage,
-                                             ContextLanguage targetLanguage, String word) {
+    public static ContextResponse getContext(Language sourceLanguage, Language targetLanguage, String word) {
 
-        Map<String, String> contextMap = new HashMap<>();
+        ContextResponse contextResponse = new ContextResponse(false,null, sourceLanguage.getFullName(),
+                targetLanguage.getFullName(), word);
 
-        String URL = CONTEXT_URL + sourceLanguage.getName() + "-" + targetLanguage.getName() + "/" + word;
-
-        Document document;
-        try {
-            document = Jsoup.connect(URL).get();
-        } catch (IOException e) {
-            return new ContextResponse(false);
+        if(sourceLanguage.equals(targetLanguage)){
+            contextResponse.setErrorMessage(properties.getProperty("message.error.translate.sameLanguage"));
         }
 
-        Elements elements = document.select(".example");
+        String URL = CONTEXT_URL + sourceLanguage.getFullName() + "-" + targetLanguage.getFullName() + "/" + word;
+
+        Connection.Response response;
+        Elements elements;
+        try {
+            response = Jsoup.connect(URL).execute();
+            elements = response.parse().select(".example");
+        } catch (IOException e) {
+            contextResponse.setErrorMessage(properties.getProperty("message.error.connection"));
+            return contextResponse;
+        }
+        if(response.statusCode()==304){
+            contextResponse.setErrorMessage(properties.getProperty("message.error.context.UnsupportedLanguages"));
+        }
+        Map<String, String> contextMap = new HashMap<>();
 
         for (Element element : elements) {
             contextMap.put(element.child(0).text(), element.child(1).text());
         }
         if (contextMap.isEmpty()) {
-            return new ContextResponse(false);
+            contextResponse.setErrorMessage(properties.getProperty("message.error.context.noResults"));
+            return contextResponse;
         }
-        return new ContextResponse(true, sourceLanguage.toString(), targetLanguage.toString(), contextMap);
-    } */
+        contextResponse.setContextResults(contextMap);
+        contextResponse.setOK(true);
+        return contextResponse;
+    }
     public static TranslateResponse getTranslations(Language sourceLanguage, Language targetLanguage, String text) {
 
         TranslationRequest request = new TranslationRequest(sourceLanguage.getSynonymName(), targetLanguage.getSynonymName(), text);
@@ -115,7 +129,6 @@ public class Reverso {
         }
 
         String responseBody = response.body();
-        Map<String, String> contextTranslations = JSONParser.getContextTranslations(response.body());
         translateResponse.setContextTranslations(JSONParser.getContextTranslations(responseBody));
         translateResponse.setTranslatedText(JSONParser.getMainTranslation(responseBody));
         translateResponse.setOK(true);
@@ -210,4 +223,41 @@ public class Reverso {
         }
     }
 }
+
+/*public static ContextResponse getContext(Language sourceLanguage, Language targetLanguage, String word) {
+
+        ContextResponse contextResponse = new ContextResponse(false,null, sourceLanguage.getFullName(),
+                targetLanguage.getFullName(), word);
+
+        if(sourceLanguage.equals(targetLanguage)){
+            contextResponse.setErrorMessage(properties.getProperty("message.error.translate.sameLanguage"));
+        }
+
+        String URL = CONTEXT_URL + sourceLanguage.getFullName() + "-" + targetLanguage.getFullName() + "/" + word;
+
+        Connection.Response response;
+        Elements elements;
+        try {
+            response = Jsoup.connect(URL).execute();
+            elements = response.parse().select(".wrap-hold-prop");
+        } catch (IOException e) {
+            contextResponse.setErrorMessage(properties.getProperty("message.error.connection"));
+            return contextResponse;
+        }
+        if(response.statusCode()==304){
+            contextResponse.setErrorMessage(properties.getProperty("message.error.context.UnsupportedLanguages"));
+        }
+        Map<String, String> contextMap = new HashMap<>();
+
+        for (Element element : elements) {
+            contextMap.put(element.child(0).text(), element.child(1).text());
+        }
+        if (contextMap.isEmpty()) {
+            contextResponse.setErrorMessage(properties.getProperty("message.error.context.noResults"));
+            return contextResponse;
+        }
+        contextResponse.setResults(contextMap);
+        contextResponse.setOK(true);
+        return contextResponse;
+    } */
 

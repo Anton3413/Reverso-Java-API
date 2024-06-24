@@ -7,29 +7,29 @@ import java.util.Map;
 public class ContextResponse extends Response {
 
     private String targetLanguage;
-    private Map<String,String> results;
+    private Map<String,String> contextResults;
 
     public ContextResponse(boolean isOK, String errorMessage, String sourceLanguage,
                            String targetLanguage, String text) {
         super(isOK,errorMessage,sourceLanguage, text );
         this.targetLanguage = targetLanguage;
-        this.results = null;
+        this.contextResults = null;
     }
 
     public ContextResponse(boolean isOK, String sourceLanguage,
                            String targetLanguage, String text,
-                           Map<String,String> results) {
+                           Map<String,String> contextResults) {
         super(isOK, sourceLanguage, text);
         this.targetLanguage = targetLanguage;
-        this.results = results;
+        this.contextResults = contextResults;
     }
 
-    public Map<String, String> getResults() {
-        return results;
+    public Map<String, String> getContextResults() {
+        return contextResults;
     }
 
-    public void setResults(Map<String, String> results) {
-        this.results = results;
+    public void setContextResults(Map<String, String> contextResults) {
+        this.contextResults = contextResults;
     }
 
     public String getTargetLanguage() {
