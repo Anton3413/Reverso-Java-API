@@ -1,12 +1,10 @@
 package reverso;
 
-import com.google.gson.Gson;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import reverso.data.jsonParser.JsonParser;
+import reverso.data.jsonParser.JSONParser;
 import reverso.data.request.TranslationRequest;
 import reverso.data.response.impl.*;
 import reverso.supportedLanguages.Language;
@@ -89,8 +87,18 @@ public class Reverso {
 
         TranslationRequest request = new TranslationRequest(sourceLanguage.getSynonymName(), targetLanguage.getSynonymName(), text);
 
-        TranslateResponse translateResponse = new TranslateResponse(false,"text",sourceLanguage.getFullName(),
+        TranslateResponse translateResponse = new TranslateResponse(false,null,sourceLanguage.getFullName(),
                 targetLanguage.getFullName(), text);
+
+        if(sourceLanguage.equals(targetLanguage)){
+            translateResponse.setErrorMessage(properties.getProperty("message.error.translate.sameLanguage"));
+            return translateResponse;
+        }
+
+        if(sourceLanguage.getTranslateName()==null||targetLanguage.getTranslateName()==null){
+            translateResponse.setErrorMessage(properties.getProperty("message.error.translate.unSupportedLanguage"));
+            return translateResponse;
+        }
 
         Connection.Response response;
         try {
@@ -98,6 +106,7 @@ public class Reverso {
                     .header("Content-Type", "application/json")
                     .requestBody(request.getAsJson())
                     .method(Connection.Method.POST)
+                    .ignoreHttpErrors(true)
                     .ignoreContentType(true)
                     .execute();
         } catch (IOException e) {
@@ -105,18 +114,14 @@ public class Reverso {
             return translateResponse;
         }
 
-        String requestResult = response.body();
+        String responseBody = response.body();
+        Map<String, String> contextTranslations = JSONParser.getContextTranslations(response.body());
+        translateResponse.setContextTranslations(JSONParser.getContextTranslations(responseBody));
+        translateResponse.setTranslatedText(JSONParser.getMainTranslation(responseBody));
+        translateResponse.setOK(true);
 
-        System.out.println(requestResult);
-        Map<String, String> contextTranslations = JsonParser.getContextTranslations(requestResult);
-
-        TranslateResponse translateResponse = new Gson().fromJson(requestResult, TranslateResponse.class);
-        translateResponse.setContextTranslations(contextTranslations);
-
-        System.out.println(translateResponse);
-        return null;
+        return translateResponse;
     }
-
 
     public static VoiceResponse getVoiceStream(Voice voice, String text) {
 
