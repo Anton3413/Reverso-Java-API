@@ -1,33 +1,35 @@
 package reverso.supportedLanguages;
 
 public enum Language {
-    ARABIC("arabic", "ar","ara"),
-    GERMAN("german", "de","ger"),
-    ENGLISH("english", "en","eng"),
-    SPANISH("spanish", "es","spa"),
-    FRENCH("french", "fr","fra"),
-    HEBREW("hebrew", "he","heb"),
-    ITALIAN("italian", "it","ita"),
-    JAPANESE("japanese", "ja","jpn"),
-    KOREAN("korean", null,"kor"),
-    DUTCH("dutch", "nl","dut"),
-    POLISH("polish", "pl","pol"),
-    PORTUGUESE("portuguese", "pt","por"),
-    ROMANIAN("romanian", "ro","rum"),
-    RUSSIAN("russian", "ru","rus"),
-    SWEDISH("swedish", null,"swe"),
-    TURKISH("turkish", null,"tur");
+    ARABIC("arabic", "ar","ara",true),
+    GERMAN("german", "de","ger",true),
+    ENGLISH("english", "en","eng",true),
+    SPANISH("spanish", "es","spa",true),
+    FRENCH("french", "fr","fra",true),
+    HEBREW("hebrew", "he","heb",true),
+    ITALIAN("italian", "it","ita",true),
+    JAPANESE("japanese", "ja","jpn",true),
+    KOREAN("korean", null,"kor",false),
+    DUTCH("dutch", "nl","dut",false),
+    POLISH("polish", "pl","pol",false),
+    PORTUGUESE("portuguese", "pt","por",true),
+    ROMANIAN("romanian", "ro","rum",false),
+    RUSSIAN("russian", "ru","rus",true),
+    SWEDISH("swedish", null,"swe",false),
+    TURKISH("turkish", null,"tur",false);
 
 
-    Language(String fullName, String synonymName,String translateName){
+    Language(String fullName, String synonymName,String translateName, boolean conjugate){
         this.fullName = fullName;
         this.synonymName = synonymName;
         this.translateName = translateName;
+        this.conjugate = conjugate;
     }
 
     private final String fullName;
     private final String synonymName;
     private final String translateName;
+    private final boolean conjugate;
 
     public String getSynonymName() {
         return this.synonymName;
@@ -35,8 +37,11 @@ public enum Language {
     public String getFullName() {
         return this.fullName;
     }
-
     public String getTranslateName() {
         return this.translateName;
+    }
+
+    public boolean isConjugate() {
+        return conjugate;
     }
 }

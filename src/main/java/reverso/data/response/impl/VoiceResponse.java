@@ -3,6 +3,7 @@ package reverso.data.response.impl;
 import reverso.data.response.Response;
 
 import java.util.Base64;
+import java.util.Map;
 
 public class VoiceResponse extends Response {
 
@@ -55,6 +56,12 @@ public class VoiceResponse extends Response {
 
     public void setMp3Data(byte[] mp3Data) {
         this.mp3Data = mp3Data;
+    }
+
+    @Override
+    protected void addCustomFields(Map<String, Object> jsonMap) {
+        jsonMap.put("voiceName", voiceName);
+        jsonMap.put("voiceGender", voiceGender);
     }
 
     @Override

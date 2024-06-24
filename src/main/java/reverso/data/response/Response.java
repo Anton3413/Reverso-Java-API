@@ -1,6 +1,11 @@
 package reverso.data.response;
 
 
+import com.google.gson.GsonBuilder;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public abstract class Response {
 
     private boolean isOK;
@@ -24,6 +29,17 @@ public abstract class Response {
         this.text = text;
         this.errorMessage=null;
     }
+    public String toJson() {
+        Map<String, Object> jsonMap = new LinkedHashMap<>();
+        jsonMap.put("isOK", isOK());
+        jsonMap.put("errorMessage", getErrorMessage());
+        jsonMap.put("sourceLanguage", getSourceLanguage());
+        jsonMap.put("text", getText());
+        addCustomFields(jsonMap); // метод для добавления дополнительных полей
+        return new GsonBuilder().setPrettyPrinting().create().toJson(jsonMap);
+    }
+
+    protected abstract void addCustomFields(Map<String, Object> jsonMap);
 
     public boolean isOK() {
         return isOK;

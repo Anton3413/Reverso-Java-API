@@ -50,14 +50,17 @@ public class Reverso {
             String errorMessage = properties.getProperty("message.error.synonym.noResults");
             return new SynonymResponse(false,errorMessage, language.getFullName(), word);
         }
-        Map<String, List<String>> synonymsMap = wrapHoldProps.stream()
-                .collect(Collectors.toMap(
-                        wrapHoldProp -> wrapHoldProp.selectFirst("div[class^=words-options pos] > h2").text(),
-                        wrapHoldProp -> wrapHoldProp.selectFirst("div[class^=pannel cluster] > div.word-opt > ul")
-                                .select("li a").stream()
-                                .map(Element::text)
-                                .collect(Collectors.toList())
-                ));
+        Map<String, List<String>> synonymsMap = new LinkedHashMap<>();
+        wrapHoldProps.forEach(wrapHoldProp -> {
+            String partOfSpeech = wrapHoldProp.selectFirst("div.words-options h2").text();
+            List<String> synonyms = wrapHoldProp.select("div.pannel ul.word-box li a")
+                    .stream()
+                    .map(Element::text)
+                    .filter(s -> !s.isEmpty()) // Filter out empty strings
+                    .collect(Collectors.toList());
+            synonymsMap.put(partOfSpeech, synonyms);
+        });
+
         return new SynonymResponse(true, language.getFullName(), word, synonymsMap);
     }
 
@@ -162,31 +165,37 @@ public class Reverso {
         return new VoiceResponse(true, voice.getLanguage(), text, voice.getName(), voice.getGender(), response.bodyAsBytes());
     }
 
-    /*public static void getWordConjugation(ContextLanguage language, String word) throws IOException {
+    public static ConjugationResponse getWordConjugation(Language language, String word) {
 
-        String URL = CONJUGATION_URL + "-" + language.toString() + "-" + "verb" + "-" + word + ".html";
+        ConjugationResponse conjugationResponse = new ConjugationResponse(false,null,language.getFullName(),word);
+
+        if(!language.isConjugate()){
+            conjugationResponse.setErrorMessage(properties.getProperty("message.error.conjugation.invalidLanguage"));
+            return conjugationResponse;
+        }
+        String URL = CONJUGATION_URL + "-" + language.getFullName() + "-" + "verb" + "-" + word + ".html";
 
         Document document = null;
 
-            Connection.Response response = Jsoup.connect(URL)
+        Connection.Response response = null;
+        try {
+            response = Jsoup.connect(URL)
                     .ignoreContentType(true)
                     .ignoreHttpErrors(true)
                     .execute();
-
-            if (response.statusCode() == 404) {
-                document = response.parse();
-                String errorMessage = document.getElementById("ch_lblCustomMessage")
-                        .text();
-            } else {
-                document = Jsoup.parse(response.body());
-            }
-
-
+            document = response.parse();
+        } catch (IOException e) {
+            conjugationResponse.setErrorMessage(properties.getProperty("message.error.connection"));
+            return conjugationResponse;
+        }
+        if (response.statusCode() == 404) {
+            conjugationResponse.setErrorMessage(properties.getProperty("message.error.conjugation.incorrectWord"));
+            return conjugationResponse;
+        }
 
         Elements resultBlock = document.getElementsByClass("word-wrap-row");
 
-        // Инициализируем мапу для хранения результатов
-        Map<String, String[]> conjugationData = new HashMap<>();
+        Map<String, String[]> conjugationData = new LinkedHashMap<>();
 
         // Проходим по каждому элементу с классом "word-wrap-row"
         for (Element element : resultBlock) {
@@ -205,15 +214,10 @@ public class Reverso {
                         conjugationData.put(key, liTexts);
             }
         }
-      *//*  ConjugationResponse response = new ConjugationResponse(true,)*//*
-
-        conjugationData.forEach((key, value) -> {
-            System.out.println("Key: " + key);
-            for (String text : value) {
-                System.out.println("  Value: " + text);
-            }
-        });
-    }*/
+        conjugationResponse.setConjugationData(conjugationData);
+        conjugationResponse.setOK(true);
+        return conjugationResponse;
+    }
      static private void initializeProperties(){
         try {
             properties = new Properties();
@@ -223,41 +227,4 @@ public class Reverso {
         }
     }
 }
-
-/*public static ContextResponse getContext(Language sourceLanguage, Language targetLanguage, String word) {
-
-        ContextResponse contextResponse = new ContextResponse(false,null, sourceLanguage.getFullName(),
-                targetLanguage.getFullName(), word);
-
-        if(sourceLanguage.equals(targetLanguage)){
-            contextResponse.setErrorMessage(properties.getProperty("message.error.translate.sameLanguage"));
-        }
-
-        String URL = CONTEXT_URL + sourceLanguage.getFullName() + "-" + targetLanguage.getFullName() + "/" + word;
-
-        Connection.Response response;
-        Elements elements;
-        try {
-            response = Jsoup.connect(URL).execute();
-            elements = response.parse().select(".wrap-hold-prop");
-        } catch (IOException e) {
-            contextResponse.setErrorMessage(properties.getProperty("message.error.connection"));
-            return contextResponse;
-        }
-        if(response.statusCode()==304){
-            contextResponse.setErrorMessage(properties.getProperty("message.error.context.UnsupportedLanguages"));
-        }
-        Map<String, String> contextMap = new HashMap<>();
-
-        for (Element element : elements) {
-            contextMap.put(element.child(0).text(), element.child(1).text());
-        }
-        if (contextMap.isEmpty()) {
-            contextResponse.setErrorMessage(properties.getProperty("message.error.context.noResults"));
-            return contextResponse;
-        }
-        contextResponse.setResults(contextMap);
-        contextResponse.setOK(true);
-        return contextResponse;
-    } */
 

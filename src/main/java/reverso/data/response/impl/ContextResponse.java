@@ -23,6 +23,11 @@ public class ContextResponse extends Response {
         this.targetLanguage = targetLanguage;
         this.contextResults = contextResults;
     }
+    @Override
+    protected void addCustomFields(Map<String, Object> jsonMap) {
+        jsonMap.put("targetLanguage", targetLanguage);
+        jsonMap.put("contextResults", contextResults);
+    }
 
     public Map<String, String> getContextResults() {
         return contextResults;
@@ -39,4 +44,5 @@ public class ContextResponse extends Response {
     public void setTargetLanguage(String targetLanguage) {
         this.targetLanguage = targetLanguage;
     }
+
 }

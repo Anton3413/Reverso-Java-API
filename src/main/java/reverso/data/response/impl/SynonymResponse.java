@@ -1,7 +1,6 @@
 package reverso.data.response.impl;
 
 import reverso.data.response.Response;
-
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +16,11 @@ public class SynonymResponse extends Response {
         super(isOK, sourceLanguage, text);
         this.synonyms = synonyms;
     }
-    
+    @Override
+    protected void addCustomFields(Map<String, Object> jsonMap) {
+        jsonMap.put("synonyms", synonyms);
+    }
+
     public Map<String, List<String>> getSynonyms() {
         return synonyms;
     }
