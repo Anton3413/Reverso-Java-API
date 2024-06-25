@@ -18,7 +18,6 @@ public enum Language {
     SWEDISH("swedish", null,"swe",false),
     TURKISH("turkish", null,"tur",false);
 
-
     Language(String fullName, String synonymName,String translateName, boolean conjugate){
         this.fullName = fullName;
         this.synonymName = synonymName;

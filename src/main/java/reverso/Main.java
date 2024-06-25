@@ -2,11 +2,9 @@ package reverso;
 
 
 import reverso.data.response.Response;
-import reverso.data.response.impl.ConjugationResponse;
-import reverso.data.response.impl.ContextResponse;
-import reverso.data.response.impl.SynonymResponse;
-import reverso.data.response.impl.TranslateResponse;
+import reverso.data.response.impl.*;
 import reverso.supportedLanguages.Language;
+import reverso.supportedLanguages.Voice;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -26,10 +24,10 @@ public class Main {
             }
         }*/
 
-        Response synonymResponse = Reverso.getSynonyms(Language.ENGLISH,"world");
 
-       // System.out.println(synonymResponse);
-        System.out.println(synonymResponse);
+        SynonymResponse response = Reverso.getSynonyms(Language.SWEDISH,"Skön");
+
+        System.out.println(response.toJson());
 
     }
 }

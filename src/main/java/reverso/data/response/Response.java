@@ -35,7 +35,7 @@ public abstract class Response {
         jsonMap.put("errorMessage", getErrorMessage());
         jsonMap.put("sourceLanguage", getSourceLanguage());
         jsonMap.put("text", getText());
-        addCustomFields(jsonMap); // метод для добавления дополнительных полей
+        addCustomFields(jsonMap);
         return new GsonBuilder().setPrettyPrinting().create().toJson(jsonMap);
     }
 

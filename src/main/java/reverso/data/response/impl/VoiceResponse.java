@@ -27,7 +27,7 @@ public class VoiceResponse extends Response {
         this.mp3Data = mp3Data;
     }
 
-    public String getDataAsBase64() {
+    public String getAudioAsBase64() {
         if(mp3Data == null) {
             throw new NullPointerException("mp3Data is null");
         }

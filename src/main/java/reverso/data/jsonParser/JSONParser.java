@@ -15,7 +15,6 @@ public class JSONParser {
 
         JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
 
-
         JsonObject contextResults = jsonObject.getAsJsonObject("contextResults");
         JsonArray results = contextResults.getAsJsonArray("results");
         JsonObject firstElement = results.get(0).getAsJsonObject(); // Первый элемент массива results
