@@ -27,7 +27,7 @@ structure and behavior.
 Abstract class Response declares the common structure of all responses 
 from the server.
 
-```java
+```
 public abstract class Response {
 
     private boolean isOK;
@@ -53,7 +53,7 @@ for obtaining the JSON representation of any received response.
 For most methods, it is necessary to specify the language, whether for 
 translation or synonym search. It is represented as an **enum** with a 
 list of all supported languages.
-```java
+```
 public enum Language {
 ARABIC("arabic", "ar", "ara", true),
 GERMAN("german", "de", "ger", true),
@@ -105,7 +105,7 @@ second method
 to the console in JSON format.
 
 Here's the output :
-```json
+```
 {
 "isOK": true,
 "sourceLanguage": "english",
@@ -117,7 +117,8 @@ Here's the output :
 "earth",
 "planet",
 "universe",
-"orb"...
+"orb",
+...
 ]
 }
 }
@@ -133,7 +134,7 @@ However, there is a method that differs slightly from the others:
 For this method, you should pass one of the objects from the Voice enum. 
 The names of the objects and their fields can tell us the language they
 speak, their gender, etc.
-```java
+```
 public enum Voice {
 ARABIC_LEILA("Leila22k", "Arabic", "F"),
 CZECH_ELISKA("Eliska22k", "Czech", "F"),
