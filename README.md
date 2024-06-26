@@ -116,7 +116,7 @@ Here's the output :
 "earth",
 "planet",
 "universe",
-"orb";
+"orb"
 ]
 }
 }
