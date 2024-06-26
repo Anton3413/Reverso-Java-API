@@ -2,7 +2,6 @@ package reverso.data.response.impl;
 
 import reverso.data.response.Response;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class ConjugationResponse extends Response {

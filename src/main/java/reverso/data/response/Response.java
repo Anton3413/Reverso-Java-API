@@ -1,6 +1,5 @@
 package reverso.data.response;
 
-
 import com.google.gson.GsonBuilder;
 
 import java.util.LinkedHashMap;

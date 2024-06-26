@@ -1,6 +1,5 @@
 package reverso.data.response.impl;
 
-import com.google.gson.Gson;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 import reverso.data.jsonParser.FromStringToArrayDeserializer;

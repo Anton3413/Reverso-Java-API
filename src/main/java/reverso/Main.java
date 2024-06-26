@@ -1,10 +1,8 @@
 package reverso;
 
 
-import reverso.data.response.Response;
 import reverso.data.response.impl.*;
 import reverso.supportedLanguages.Language;
-import reverso.supportedLanguages.Voice;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -29,5 +27,9 @@ public class Main {
 
         System.out.println(response.toJson());
 
+        if(response.isOK()){
+            var synonyms = response.getSynonyms();
+        }
+        else System.out.println(response.getErrorMessage());
     }
 }
