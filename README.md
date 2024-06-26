@@ -27,7 +27,7 @@ structure and behavior.
 Abstract class Response declares the common structure of all responses 
 from the server.
 
-```
+```java
 public abstract class Response {
 
     private boolean isOK;
@@ -37,7 +37,7 @@ public abstract class Response {
     private String text;
 
     private String errorMessage;
-    ...
+    
     public String toJson();
 }
 ```
@@ -53,12 +53,11 @@ for obtaining the JSON representation of any received response.
 For most methods, it is necessary to specify the language, whether for 
 translation or synonym search. It is represented as an **enum** with a 
 list of all supported languages.
-```
+```java
 public enum Language {
 ARABIC("arabic", "ar", "ara", true),
 GERMAN("german", "de", "ger", true),
 ENGLISH("english", "en", "eng", true);
-...
 }
 ```
 Each object in this enumeration has fields that help determine whether
@@ -74,9 +73,9 @@ If any of these fields are false or null, it indicates that the language
 does not support the respective functionality.
 
 For example:
-
-`KOREAN("korean", null, "kor", false)` 
-
+```java
+KOREAN("korean", null, "kor", false); 
+```
 Since the second and fourth fields are **null** and **false**, 
 respectively, this means that **synonym** search and verb 
 **conjugation** are not available for *korean* language.
@@ -105,7 +104,7 @@ second method
 to the console in JSON format.
 
 Here's the output :
-```
+```json
 {
 "isOK": true,
 "sourceLanguage": "english",
@@ -117,8 +116,7 @@ Here's the output :
 "earth",
 "planet",
 "universe",
-"orb",
-...
+"orb";
 ]
 }
 }
@@ -134,14 +132,13 @@ However, there is a method that differs slightly from the others:
 For this method, you should pass one of the objects from the Voice enum. 
 The names of the objects and their fields can tell us the language they
 speak, their gender, etc.
-```
+```java
 public enum Voice {
 ARABIC_LEILA("Leila22k", "Arabic", "F"),
 CZECH_ELISKA("Eliska22k", "Czech", "F"),
 FRENCH_ANTOINE("Antoine22k", "French", "M"),
 ITALIAN_CHIARA("Chiara22k", "Italian", "F"),
 GERMAN_ANDREAS("Andreas22k", "German", "M"),
-...
 }
 ```
 Among other information, the VoiceResponse contains a byte array that 
@@ -174,8 +171,7 @@ Here's an example of a successful response:
 "contextTranslations": {
 "My aunt said to tell you hello.": "Моя тётя просила передать вам привет.",
 "I get in the car and say hello.": "Я сел в машину и сказал привет.",
-"He said to tell his son hello.": "Он сказал передать привет своему сыну.",
-...
+"He said to tell his son hello.": "Он сказал передать привет своему сыну."
 }
 }
 ```
