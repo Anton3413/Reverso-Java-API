@@ -143,6 +143,7 @@ public class Reverso {
 
         String base64Text = Base64.getEncoder().encodeToString(text.getBytes());
 
+        VoiceResponse voiceResponse = new VoiceResponse(false,null, voice.getLanguage(), text, voice.getName(), voice.getGender());
         String requestURL = VOICE_URL + "voiceName=" + voice.getName() + "?voiceSpeed=80" + "&" + "inputText=" + base64Text;
 
         Connection.Response response;
@@ -152,17 +153,24 @@ public class Reverso {
                     .ignoreHttpErrors(true)
                     .execute();
         } catch (IOException e) {
-            String errorMessage = properties.getProperty("message.error.connection");
-            return new VoiceResponse(false,errorMessage, voice.getLanguage(), text, voice.getName(), voice.getGender());
+            voiceResponse.setErrorMessage(properties.getProperty("message.error.connection"));
+            return voiceResponse;
         }
-        if(response.statusCode() == 404) {
-            String errorMessage = properties.getProperty("message.error.voiceStream.404");
-            return new VoiceResponse(false,errorMessage, voice.getLanguage(), text, voice.getName(), voice.getGender());
-        } else if (response.bodyAsBytes().length == 9358) {
-            String errorMessage = properties.getProperty("message.error.voiceStream.textTooLong");
-            return new VoiceResponse(false,errorMessage, voice.getLanguage(), text, voice.getName(), voice.getGender());
+        if(response.statusCode()==400){
+            voiceResponse.setErrorMessage(properties.getProperty("message.error.voiceStream.400"));
+            return voiceResponse;
         }
-        return new VoiceResponse(true, voice.getLanguage(), text, voice.getName(), voice.getGender(), response.bodyAsBytes());
+        else if(response.statusCode() == 404) {
+            voiceResponse.setErrorMessage(properties.getProperty("message.error.voiceStream.404.textTooLong"));
+            return voiceResponse;
+        }
+        else if (response.bodyAsBytes().length == 9358) {
+            voiceResponse.setErrorMessage(properties.getProperty("message.error.voiceStream.9358BytesResponse"));
+            return voiceResponse;
+        }
+        voiceResponse.setOK(true);
+        voiceResponse.setMp3Data(response.bodyAsBytes());
+        return voiceResponse;
     }
 
     public static ConjugationResponse getWordConjugation(Language language, String word) {
