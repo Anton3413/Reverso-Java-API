@@ -28,27 +28,27 @@ public class Reverso {
         initializeProperties();
     }
 
-    public static SynonymResponse getSynonyms(Language language, String word){
-        if(language.getSynonymName()==null){
+    public static SynonymResponse getSynonyms(Language language, String word) {
+        if (language.getSynonymName() == null) {
             String errorMessage = properties.getProperty("message.error.synonym.unSupportedLanguage");
-            return new SynonymResponse(false,errorMessage, language.getFullName(), word);
+            return new SynonymResponse(false, errorMessage, language.getFullName(), word);
         }
         String URL = SYNONYM_URL + language.getSynonymName() + "/" + word;
 
         Connection.Response response;
         Elements wrapHoldProps;
         try {
-           response= Jsoup.connect(URL)
-                   .ignoreHttpErrors(true)
-                   .execute();
+            response = Jsoup.connect(URL)
+                    .ignoreHttpErrors(true)
+                    .execute();
             wrapHoldProps = response.parse().select(".wrap-hold-prop");
         } catch (IOException e) {
             String errorMessage = properties.getProperty("message.error.connection");
-            return new SynonymResponse(false,errorMessage, language.getFullName(), word);
+            return new SynonymResponse(false, errorMessage, language.getFullName(), word);
         }
-        if(response.statusCode()==404){
+        if (response.statusCode() == 404) {
             String errorMessage = properties.getProperty("message.error.synonym.noResults");
-            return new SynonymResponse(false,errorMessage, language.getFullName(), word);
+            return new SynonymResponse(false, errorMessage, language.getFullName(), word);
         }
         Map<String, List<String>> synonymsMap = new LinkedHashMap<>();
         wrapHoldProps.forEach(wrapHoldProp -> {
@@ -60,6 +60,10 @@ public class Reverso {
                     .collect(Collectors.toList());
             synonymsMap.put(partOfSpeech, synonyms);
         });
+        if(synonymsMap.isEmpty()) {
+            String message = properties.getProperty("message.error.synonym.noResults");
+            return new SynonymResponse(false, message, language.getFullName(), word);
+        }
 
         return new SynonymResponse(true, language.getFullName(), word, synonymsMap);
     }

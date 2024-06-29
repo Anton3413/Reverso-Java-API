@@ -16,7 +16,7 @@ import java.util.Map;
 public class Main {
     public static void main(String[] args) {
 
-        VoiceResponse response = Reverso.getVoiceStream(Voice.MANDARIN_CHINESE_LULU,"你好你ddf好嗎ll？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？");
+        /*VoiceResponse response = Reverso.getVoiceStream(Voice.MANDARIN_CHINESE_LULU,"你好你ddf好嗎ll？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？你好你好嗎？");
         System.out.println(response.toJson());
 
         if(!response.isOK()){
@@ -45,7 +45,13 @@ public class Main {
             throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
+        }*/
+
+        SynonymResponse response = Reverso.getSynonyms(Language.SPANISH,"increíble");
+
+        if(response.isOK()) {
+            System.out.println(response.toJson());
+        }else System.out.println(response.getErrorMessage());
 
     }
 }
