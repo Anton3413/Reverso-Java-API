@@ -38,6 +38,7 @@ public class getSynonymsTest {
         assertNull(synonymResponse.getErrorMessage());
         assertNotNull(synonymResponse.getSynonyms());
         assertTrue(synonymResponse.getSynonyms().get("Adjective").size() > 10);
+        assertTrue(synonymResponse.getSynonyms().get("Adjective").contains("fabuloso"));
     }
     @Test
     void successArabicSynonymsRequest(){
@@ -47,6 +48,7 @@ public class getSynonymsTest {
         assertNull(synonymResponse.getErrorMessage());
         assertNotNull(synonymResponse.getSynonyms());
         assertTrue(synonymResponse.getSynonyms().get("Adjective").size() > 10);
+        assertTrue(synonymResponse.getSynonyms().get("Adjective").contains("لطيف"));
     }
     @Test
     void failedUnsupportedLanguageRequest(){
@@ -70,17 +72,6 @@ public class getSynonymsTest {
         assertEquals(properties.getProperty("message.error.synonym.noResults"),synonymResponse.getErrorMessage());
         assertThrows(NullPointerException.class, () -> synonymResponse.getSynonyms().get("Adjective").size());
     }
-
-
-
-
-
-
-
-
-
-
-
 
     @AfterEach
     void initializeInstance(){

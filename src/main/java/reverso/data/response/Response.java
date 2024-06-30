@@ -35,7 +35,7 @@ public abstract class Response {
         jsonMap.put("sourceLanguage", getSourceLanguage());
         jsonMap.put("text", getText());
         addCustomFields(jsonMap);
-        return new GsonBuilder().setPrettyPrinting().create().toJson(jsonMap);
+        return new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(jsonMap);
     }
 
     protected abstract void addCustomFields(Map<String, Object> jsonMap);

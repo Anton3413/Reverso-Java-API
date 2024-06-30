@@ -47,11 +47,20 @@ public class Main {
             throw new RuntimeException(e);
         }*/
 
-        SynonymResponse response = Reverso.getSynonyms(Language.SPANISH,"increíble");
+       /* SynonymResponse response = Reverso.getSynonyms(Language.SPANISH,"increíble");
 
         if(response.isOK()) {
             System.out.println(response.toJson());
         }else System.out.println(response.getErrorMessage());
+*/
+        /*ContextResponse contextResponse = Reverso.getContext(Language.UKRAINIAN,Language.JAPANESE,"яблуко");
+        System.out.println(contextResponse.toJson());
+        System.out.println(contextResponse.getContextResults());*/
 
+        ConjugationResponse conjugationResponse = Reverso.getWordConjugation(Language.RUSSIAN,"идти");
+
+        if(conjugationResponse.isOK()){
+            System.out.println(conjugationResponse.toJson());
+        }
     }
 }

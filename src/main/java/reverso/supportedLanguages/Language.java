@@ -16,7 +16,8 @@ public enum Language {
     ROMANIAN("romanian", "ro","rum",false),
     RUSSIAN("russian", "ru","rus",true),
     SWEDISH("swedish", null,"swe",false),
-    TURKISH("turkish", null,"tur",false);
+    TURKISH("turkish", null,"tur",false),
+    UKRAINIAN("ukrainian",null,null,false);
 
     Language(String fullName, String synonymName,String translateName, boolean conjugate){
         this.fullName = fullName;

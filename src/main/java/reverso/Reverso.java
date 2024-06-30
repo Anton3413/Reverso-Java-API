@@ -3,18 +3,12 @@ package reverso;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import reverso.data.jsonParser.JSONParser;
-import reverso.data.request.TranslationRequest;
+import reverso.data.parser.HtmlParser;
 import reverso.data.response.impl.*;
 import reverso.supportedLanguages.Language;
 import reverso.supportedLanguages.Voice;
-
-
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Reverso {
     private static Properties properties;
@@ -35,13 +29,12 @@ public class Reverso {
         }
         String URL = SYNONYM_URL + language.getSynonymName() + "/" + word;
 
+        Map<String, List<String>> synonymsMap;
         Connection.Response response;
-        Elements wrapHoldProps;
         try {
             response = Jsoup.connect(URL)
                     .ignoreHttpErrors(true)
                     .execute();
-            wrapHoldProps = response.parse().select(".wrap-hold-prop");
         } catch (IOException e) {
             String errorMessage = properties.getProperty("message.error.connection");
             return new SynonymResponse(false, errorMessage, language.getFullName(), word);
@@ -50,21 +43,11 @@ public class Reverso {
             String errorMessage = properties.getProperty("message.error.synonym.noResults");
             return new SynonymResponse(false, errorMessage, language.getFullName(), word);
         }
-        Map<String, List<String>> synonymsMap = new LinkedHashMap<>();
-        wrapHoldProps.forEach(wrapHoldProp -> {
-            String partOfSpeech = wrapHoldProp.selectFirst("div.words-options h2").text();
-            List<String> synonyms = wrapHoldProp.select("div.pannel ul.word-box li a")
-                    .stream()
-                    .map(Element::text)
-                    .filter(s -> !s.isEmpty()) // Filter out empty strings
-                    .collect(Collectors.toList());
-            synonymsMap.put(partOfSpeech, synonyms);
-        });
+        synonymsMap = HtmlParser.parseSynonymsPage(response);
         if(synonymsMap.isEmpty()) {
             String message = properties.getProperty("message.error.synonym.noResults");
             return new SynonymResponse(false, message, language.getFullName(), word);
         }
-
         return new SynonymResponse(true, language.getFullName(), word, synonymsMap);
     }
 
@@ -76,26 +59,25 @@ public class Reverso {
         if(sourceLanguage.equals(targetLanguage)){
             contextResponse.setErrorMessage(properties.getProperty("message.error.translate.sameLanguage"));
         }
-
         String URL = CONTEXT_URL + sourceLanguage.getFullName() + "-" + targetLanguage.getFullName() + "/" + word;
 
+        Document document;
+        Map<String,String> contextMap;
         Connection.Response response;
-        Elements elements;
         try {
-            response = Jsoup.connect(URL).execute();
-            elements = response.parse().select(".example");
+            response = Jsoup.connect(URL)
+                    .ignoreHttpErrors(true)
+                    .execute();
+            document = response.parse();
         } catch (IOException e) {
             contextResponse.setErrorMessage(properties.getProperty("message.error.connection"));
             return contextResponse;
         }
-        if(response.statusCode()==304){
+        if(!document.getElementsByClass("hero-section").isEmpty()){
             contextResponse.setErrorMessage(properties.getProperty("message.error.context.UnsupportedLanguages"));
+            return contextResponse;
         }
-        Map<String, String> contextMap = new HashMap<>();
-
-        for (Element element : elements) {
-            contextMap.put(element.child(0).text(), element.child(1).text());
-        }
+        contextMap = HtmlParser.parseContextPage(document);
         if (contextMap.isEmpty()) {
             contextResponse.setErrorMessage(properties.getProperty("message.error.context.noResults"));
             return contextResponse;
@@ -103,44 +85,6 @@ public class Reverso {
         contextResponse.setContextResults(contextMap);
         contextResponse.setOK(true);
         return contextResponse;
-    }
-    public static TranslateResponse getTranslations(Language sourceLanguage, Language targetLanguage, String text) {
-
-        TranslationRequest request = new TranslationRequest(sourceLanguage.getSynonymName(), targetLanguage.getSynonymName(), text);
-
-        TranslateResponse translateResponse = new TranslateResponse(false,null,sourceLanguage.getFullName(),
-                targetLanguage.getFullName(), text);
-
-        if(sourceLanguage.equals(targetLanguage)){
-            translateResponse.setErrorMessage(properties.getProperty("message.error.translate.sameLanguage"));
-            return translateResponse;
-        }
-
-        if(sourceLanguage.getTranslateName()==null||targetLanguage.getTranslateName()==null){
-            translateResponse.setErrorMessage(properties.getProperty("message.error.translate.unSupportedLanguage"));
-            return translateResponse;
-        }
-
-        Connection.Response response;
-        try {
-            response = Jsoup.connect(TRANSLATE_URL)
-                    .header("Content-Type", "application/json")
-                    .requestBody(request.getAsJson())
-                    .method(Connection.Method.POST)
-                    .ignoreHttpErrors(true)
-                    .ignoreContentType(true)
-                    .execute();
-        } catch (IOException e) {
-            translateResponse.setErrorMessage(properties.getProperty("message.error.connection"));
-            return translateResponse;
-        }
-
-        String responseBody = response.body();
-        translateResponse.setContextTranslations(JSONParser.getContextTranslations(responseBody));
-        translateResponse.setTranslatedText(JSONParser.getMainTranslation(responseBody));
-        translateResponse.setOK(true);
-
-        return translateResponse;
     }
 
     public static VoiceResponse getVoiceStream(Voice voice, String text) {
@@ -187,15 +131,13 @@ public class Reverso {
         }
         String URL = CONJUGATION_URL + "-" + language.getFullName() + "-" + "verb" + "-" + word + ".html";
 
-        Document document = null;
-
-        Connection.Response response = null;
+        Map<String, String[]> conjugationData;
+        Connection.Response response;
         try {
             response = Jsoup.connect(URL)
                     .ignoreContentType(true)
                     .ignoreHttpErrors(true)
                     .execute();
-            document = response.parse();
         } catch (IOException e) {
             conjugationResponse.setErrorMessage(properties.getProperty("message.error.connection"));
             return conjugationResponse;
@@ -204,28 +146,8 @@ public class Reverso {
             conjugationResponse.setErrorMessage(properties.getProperty("message.error.conjugation.incorrectWord"));
             return conjugationResponse;
         }
+        conjugationData = HtmlParser.parseConjugationPage(response);
 
-        Elements resultBlock = document.getElementsByClass("word-wrap-row");
-
-        Map<String, String[]> conjugationData = new LinkedHashMap<>();
-
-        // Проходим по каждому элементу с классом "word-wrap-row"
-        for (Element element : resultBlock) {
-            // Ищем все дочерние элементы с классом "blue-box-wrap", у которых есть атрибут "mobile-title"
-            Elements blueBoxWraps = element.getElementsByClass("blue-box-wrap");
-            for (Element blueBoxWrap : blueBoxWraps) {
-                    // Извлекаем текст атрибута "mobile-title" для ключа
-                    String key = blueBoxWrap.attr("mobile-title");
-
-                        // Инициализируем массив для хранения текстов элементов "li"
-                        String[] liTexts = blueBoxWrap.selectFirst("ul")
-                                .select("li").stream()
-                                .map(li -> li.getElementsByTag("i").text())
-                                .toArray(String[]::new);
-                        // Добавляем ключ и массив текстов в мапу
-                        conjugationData.put(key, liTexts);
-            }
-        }
         conjugationResponse.setConjugationData(conjugationData);
         conjugationResponse.setOK(true);
         return conjugationResponse;
