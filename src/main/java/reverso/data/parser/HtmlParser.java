@@ -6,7 +6,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
-import reverso.Reverso;
 
 import java.io.IOException;
 import java.util.*;
@@ -15,14 +14,14 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class HtmlParser {
-    private static final Logger logger = Logger.getLogger(HtmlParser.class.getName());
-    private static Properties properties;
+    private final Logger logger = Logger.getLogger(HtmlParser.class.getName());
+    private final Properties properties;
 
-    static {
-        initializeProperties();
+    public HtmlParser(Properties properties) {
+        this.properties = properties;
     }
 
-    public static Map<String, String[]> parseConjugationPage(Connection.Response response){
+    public Map<String, String[]> parseConjugationPage(Connection.Response response){
 
         Elements resultBlock = null;
         try {
@@ -47,7 +46,7 @@ public class HtmlParser {
         return conjugationData;
     }
 
-    public static Map<String, String> parseContextPage(Document document) {
+    public Map<String, String> parseContextPage(Document document) {
         Elements elements = document.select(".example");
 
         Map<String, String> contextMap = new HashMap<>();
@@ -60,7 +59,7 @@ public class HtmlParser {
         return contextMap;
     }
 
-    public static Map<String, List<String>> parseSynonymsPage(Connection.Response synonymsResponse) {
+    public Map<String, List<String>> parseSynonymsPage(Connection.Response synonymsResponse) {
 
         Elements wrapHoldProps = null;
         try {
@@ -84,7 +83,7 @@ public class HtmlParser {
         return synonymsMap;
     }
 
-    private static String extractTextWithEmphasis(Element element) {
+    private String extractTextWithEmphasis(Element element) {
         StringBuilder sb = new StringBuilder();
         for (Node child : element.childNodes()) {
             if (child instanceof TextNode) {
@@ -101,13 +100,10 @@ public class HtmlParser {
         }
         return sb.toString();
     }
-
-    static private void initializeProperties(){
-        try {
-            properties = new Properties();
-            properties.load(Reverso.class.getResourceAsStream("/messages.properties"));
-        } catch (IOException e) {
-            throw new RuntimeException("Problem during properties file initialization. Possibly the path is incorrect");
-        }
+    public String[] parseContextPageGetTranslations(Document document) {
+        return document.getElementsByClass("display-term")
+                .stream()
+                .map(Element::text)
+                .toArray(String[]::new);
     }
 }

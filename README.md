@@ -81,19 +81,22 @@ respectively, this means that **synonym** search and verb
 **conjugation** are not available for *korean* language.
 
 ## Usage
-The fundamental class is the static class **`Reverso`**.
-It manages all interactions with the API.
+The fundamental class, **Reverso**, manages all interactions with the API.
+First, we need to create an instance of this class.
 ## Standard workflow
-To retrieve the necessary data, we must call one of the static methods 
+To retrieve the necessary data, we must call one of the methods 
 of this class.
 
 For example:
-```java
-ConjugationResponse conjugationResponse = Reverso.getWordConjugation
-(Language.RUSSIAN,"идти");
 
-SynonymResponse response = Reverso.getSynonyms(Language.ENGLISH,"world");
-System.out.println(response.toJson());
+```java
+Reverso reverso = new Reverso();
+
+ConjugationResponse conjugationResponse = reverso.getWordConjugation(Language.RUSSIAN, "идти");
+
+SynonymResponse synonymResponse = reverso.getSynonyms(Language.ENGLISH, "world");
+
+System.out.println(synonymsResponse.toJson());
 ```
 In this example, we want to obtain the conjugation for the Russian verb 
 'идти'. Additionally, we want to get synonyms for the English word 'world'.
@@ -127,7 +130,7 @@ arguments, such as the translation method, which is logical.
 ## getVoiceStream
 However, there is a method that differs slightly from the others:
 
-`static VoiceResponse getVoiceStream(Voice voice, String text)`
+`VoiceResponse getVoiceStream(Voice voice, String text)`
 
 For this method, you should pass one of the objects from the Voice enum. 
 The names of the objects and their fields can tell us the language they
@@ -145,7 +148,8 @@ Among other information, the VoiceResponse contains a byte array that
 stores the audio file, which voices the required text. To get the audio 
 data, you can use the following code:
 ```java
-VoiceResponse voiceResponse = Reverso.getVoiceStream(Voice.US_ENGLISH_KAREN, "wonderful world");
+Reverso reverso = new Reverso();
+VoiceResponse voiceResponse = reverso.getVoiceStream(Voice.US_ENGLISH_KAREN, "wonderful world");
 
 byte[] mp3Data = voiceResponse.getMp3Data();
 ```
@@ -195,8 +199,10 @@ getErrorMessage()`. If the request is successful,
 this method, of course, returns `null`.
 
 Here is an example of a failed request and the response in JSON format:
+
 ```java
-SynonymResponse response = Reverso.getSynonyms(Language.SWEDISH, "Skön");
+Reverso reverso = new Reverso();
+SynonymResponse response = reverso.getSynonyms(Language.SWEDISH, "Skön");
 System.out.println(response.toJson());
 ```
 And console output:

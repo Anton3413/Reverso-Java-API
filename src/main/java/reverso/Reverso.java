@@ -11,18 +11,19 @@ import java.io.IOException;
 import java.util.*;
 
 public class Reverso {
-    private static Properties properties;
+    private HtmlParser parser;
+    private Properties properties;
     private static final String SYNONYM_URL = "https://synonyms.reverso.net/synonym/";
     private static final String CONTEXT_URL = "https://context.reverso.net/translation/";
-    private static final String TRANSLATE_URL = "https://api.reverso.net/translate/v1/translation";
     private static final String VOICE_URL = "https://voice.reverso.net/RestPronunciation.svc/v1/output=json/GetVoiceStream/";
     private static final String CONJUGATION_URL = "https://conjugator.reverso.net/conjugation";
 
-    static {
+    {
         initializeProperties();
+        initializeParser(properties);
     }
 
-    public static SynonymResponse getSynonyms(Language language, String word) {
+    public SynonymResponse getSynonyms(Language language, String word) {
         if (language.getSynonymName() == null) {
             String errorMessage = properties.getProperty("message.error.synonym.unSupportedLanguage");
             return new SynonymResponse(false, errorMessage, language.getFullName(), word);
@@ -43,26 +44,28 @@ public class Reverso {
             String errorMessage = properties.getProperty("message.error.synonym.noResults");
             return new SynonymResponse(false, errorMessage, language.getFullName(), word);
         }
-        synonymsMap = HtmlParser.parseSynonymsPage(response);
-        if(synonymsMap.isEmpty()) {
+        synonymsMap = parser.parseSynonymsPage(response);
+        if (synonymsMap.isEmpty()) {
             String message = properties.getProperty("message.error.synonym.noResults");
             return new SynonymResponse(false, message, language.getFullName(), word);
         }
         return new SynonymResponse(true, language.getFullName(), word, synonymsMap);
     }
 
-    public static ContextResponse getContext(Language sourceLanguage, Language targetLanguage, String word) {
+    public ContextResponse getContext(Language sourceLanguage, Language targetLanguage, String word) {
 
-        ContextResponse contextResponse = new ContextResponse(false,null, sourceLanguage.getFullName(),
+        ContextResponse contextResponse = new ContextResponse(false, null, sourceLanguage.getFullName(),
                 targetLanguage.getFullName(), word);
 
-        if(sourceLanguage.equals(targetLanguage)){
-            contextResponse.setErrorMessage(properties.getProperty("message.error.translate.sameLanguage"));
+        if (sourceLanguage.equals(targetLanguage)) {
+            contextResponse.setErrorMessage(properties.getProperty("message.error.context.sameLanguage"));
+            return contextResponse;
         }
         String URL = CONTEXT_URL + sourceLanguage.getFullName() + "-" + targetLanguage.getFullName() + "/" + word;
 
         Document document;
-        Map<String,String> contextMap;
+        Map<String, String> contextMap;
+        String[] translations;
         Connection.Response response;
         try {
             response = Jsoup.connect(URL)
@@ -73,25 +76,28 @@ public class Reverso {
             contextResponse.setErrorMessage(properties.getProperty("message.error.connection"));
             return contextResponse;
         }
-        if(!document.getElementsByClass("hero-section").isEmpty()){
+        if (!document.getElementsByClass("hero-section").isEmpty()) {
             contextResponse.setErrorMessage(properties.getProperty("message.error.context.UnsupportedLanguages"));
             return contextResponse;
         }
-        contextMap = HtmlParser.parseContextPage(document);
-        if (contextMap.isEmpty()) {
+        translations = parser.parseContextPageGetTranslations(document);
+        if (translations.length == 0) {
             contextResponse.setErrorMessage(properties.getProperty("message.error.context.noResults"));
             return contextResponse;
         }
+        contextMap = parser.parseContextPage(document);
+
         contextResponse.setContextResults(contextMap);
         contextResponse.setOK(true);
+        contextResponse.setTranslations(translations);
         return contextResponse;
     }
 
-    public static VoiceResponse getVoiceStream(Voice voice, String text) {
+    public VoiceResponse getVoiceStream(Voice voice, String text) {
 
         String base64Text = Base64.getEncoder().encodeToString(text.getBytes());
 
-        VoiceResponse voiceResponse = new VoiceResponse(false,null, voice.getLanguage(), text, voice.getName(), voice.getGender());
+        VoiceResponse voiceResponse = new VoiceResponse(false, null, voice.getLanguage(), text, voice.getName(), voice.getGender());
         String requestURL = VOICE_URL + "voiceName=" + voice.getName() + "?voiceSpeed=80" + "&" + "inputText=" + base64Text;
 
         Connection.Response response;
@@ -104,15 +110,13 @@ public class Reverso {
             voiceResponse.setErrorMessage(properties.getProperty("message.error.connection"));
             return voiceResponse;
         }
-        if(response.statusCode()==400){
+        if (response.statusCode() == 400) {
             voiceResponse.setErrorMessage(properties.getProperty("message.error.voiceStream.400"));
             return voiceResponse;
-        }
-        else if(response.statusCode() == 404) {
+        } else if (response.statusCode() == 404) {
             voiceResponse.setErrorMessage(properties.getProperty("message.error.voiceStream.404.textTooLong"));
             return voiceResponse;
-        }
-        else if (response.bodyAsBytes().length == 9358) {
+        } else if (response.bodyAsBytes().length == 9358) {
             voiceResponse.setErrorMessage(properties.getProperty("message.error.voiceStream.9358BytesResponse"));
             return voiceResponse;
         }
@@ -121,11 +125,11 @@ public class Reverso {
         return voiceResponse;
     }
 
-    public static ConjugationResponse getWordConjugation(Language language, String word) {
+    public ConjugationResponse getWordConjugation(Language language, String word) {
 
-        ConjugationResponse conjugationResponse = new ConjugationResponse(false,null,language.getFullName(),word);
+        ConjugationResponse conjugationResponse = new ConjugationResponse(false, null, language.getFullName(), word);
 
-        if(!language.isConjugate()){
+        if (!language.isConjugate()) {
             conjugationResponse.setErrorMessage(properties.getProperty("message.error.conjugation.invalidLanguage"));
             return conjugationResponse;
         }
@@ -146,13 +150,14 @@ public class Reverso {
             conjugationResponse.setErrorMessage(properties.getProperty("message.error.conjugation.incorrectWord"));
             return conjugationResponse;
         }
-        conjugationData = HtmlParser.parseConjugationPage(response);
+        conjugationData = parser.parseConjugationPage(response);
 
         conjugationResponse.setConjugationData(conjugationData);
         conjugationResponse.setOK(true);
         return conjugationResponse;
     }
-     static private void initializeProperties(){
+
+    private void initializeProperties() {
         try {
             properties = new Properties();
             properties.load(Reverso.class.getResourceAsStream("/messages.properties"));
@@ -160,5 +165,10 @@ public class Reverso {
             throw new RuntimeException("Problem during properties file initialization. Possibly the path is incorrect");
         }
     }
+
+    private void initializeParser(Properties properties){
+        parser = new HtmlParser(properties);
+    }
 }
+
 

@@ -14,12 +14,13 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class getVoiceStreamTest {
     private static final Logger logger = Logger.getLogger(getVoiceStreamTest.class.getName());
-
+    Reverso reverso;
     VoiceResponse voiceResponse;
     Properties properties;
 
     @BeforeAll
-    void initializeProperties() {
+    void initializeReversoAndProperties() {
+        reverso = new Reverso();
         properties = new Properties();
         try {
             properties.load(Reverso.class.getResourceAsStream("/messages.properties"));
@@ -30,7 +31,7 @@ class getVoiceStreamTest {
 
     @Test
     void successRandomEnglishRequest(){
-        voiceResponse = Reverso.getVoiceStream(Voice.getRandomEnglish(),"Big Brother is watching you.");
+        voiceResponse = reverso.getVoiceStream(Voice.getRandomEnglish(),"Big Brother is watching you.");
         assertTrue(voiceResponse.isOK());
         assertDoesNotThrow(() ->voiceResponse.getAudioAsBase64());
         assertNull(voiceResponse.getErrorMessage());
@@ -39,7 +40,7 @@ class getVoiceStreamTest {
 
     @Test
     void successRussianRequest(){
-        voiceResponse = Reverso.getVoiceStream(Voice.RUSSIAN_ALYONA,
+        voiceResponse = reverso.getVoiceStream(Voice.RUSSIAN_ALYONA,
                 "Ни за что на свете не держитесь за слово 'никогда'.");
         assertTrue(voiceResponse.isOK());
         assertEquals(Voice.RUSSIAN_ALYONA.getLanguage(), voiceResponse.getSourceLanguage());
@@ -49,7 +50,7 @@ class getVoiceStreamTest {
     }
     @Test
     void successFrenchRequest(){
-        voiceResponse = Reverso.getVoiceStream(Voice.FRENCH_ANTOINE,
+        voiceResponse = reverso.getVoiceStream(Voice.FRENCH_ANTOINE,
                 "Le temps passe vite quand on s'amuse.");
         assertTrue(voiceResponse.isOK());
         assertEquals(Voice.FRENCH_ANTOINE.getLanguage(), voiceResponse.getSourceLanguage());
@@ -60,7 +61,7 @@ class getVoiceStreamTest {
 
     @Test
     void failureDifferentVoiceAndTextRequest(){
-        voiceResponse = Reverso.getVoiceStream(Voice.ARABIC_LEILA,"你好！");
+        voiceResponse = reverso.getVoiceStream(Voice.ARABIC_LEILA,"你好！");
         assertFalse(voiceResponse.isOK());
         assertNull(voiceResponse.getMp3Data());
         assertNotNull(voiceResponse.getErrorMessage());
@@ -72,7 +73,7 @@ class getVoiceStreamTest {
     void failureChineseTextTooLongRequest(){
         String longText = "你好！".repeat(500);
 
-        voiceResponse = Reverso.getVoiceStream(Voice.ENGLISH_LISA,longText);
+        voiceResponse = reverso.getVoiceStream(Voice.ENGLISH_LISA,longText);
 
         assertFalse(voiceResponse.isOK());
         assertNull(voiceResponse.getMp3Data());

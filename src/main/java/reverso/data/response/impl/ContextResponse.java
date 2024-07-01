@@ -8,6 +8,7 @@ public class ContextResponse extends Response {
 
     private String targetLanguage;
     private Map<String,String> contextResults;
+    private String[] translations;
 
     public ContextResponse(boolean isOK, String errorMessage, String sourceLanguage,
                            String targetLanguage, String text) {
@@ -18,15 +19,18 @@ public class ContextResponse extends Response {
 
     public ContextResponse(boolean isOK, String sourceLanguage,
                            String targetLanguage, String text,
-                           Map<String,String> contextResults) {
+                           Map<String,String> contextResults,
+                           String[] translations ) {
         super(isOK, sourceLanguage, text);
         this.targetLanguage = targetLanguage;
         this.contextResults = contextResults;
+        this.translations = translations;
     }
     @Override
     protected void addCustomFields(Map<String, Object> jsonMap) {
         jsonMap.put("targetLanguage", targetLanguage);
         jsonMap.put("contextResults", contextResults);
+        jsonMap.put("translations", translations);
     }
 
     public Map<String, String> getContextResults() {
@@ -45,4 +49,11 @@ public class ContextResponse extends Response {
         this.targetLanguage = targetLanguage;
     }
 
+    public String[] getTranslations() {
+        return translations;
+    }
+
+    public void setTranslations(String[] translations) {
+        this.translations = translations;
+    }
 }

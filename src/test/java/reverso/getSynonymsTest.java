@@ -15,13 +15,15 @@ import java.util.logging.Logger;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class getSynonymsTest {
-    private static final Logger logger = Logger.getLogger(getVoiceStreamTest.class.getName());
+    private final Logger logger = Logger.getLogger(getVoiceStreamTest.class.getName());
 
+    Reverso reverso;
     SynonymResponse synonymResponse;
     Properties properties;
 
     @BeforeAll
-    void initializeProperties() {
+    void initializeReversoAndProperties() {
+        reverso = new Reverso();
         properties = new Properties();
         try {
             properties.load(Reverso.class.getResourceAsStream("/messages.properties"));
@@ -32,7 +34,7 @@ public class getSynonymsTest {
 
     @Test
     void successSpanishSynonymsResponse(){
-        synonymResponse = Reverso.getSynonyms(Language.SPANISH,"increíble");
+        synonymResponse = reverso.getSynonyms(Language.SPANISH,"increíble");
 
         assertTrue(synonymResponse.isOK());
         assertNull(synonymResponse.getErrorMessage());
@@ -42,7 +44,7 @@ public class getSynonymsTest {
     }
     @Test
     void successArabicSynonymsRequest(){
-        synonymResponse = Reverso.getSynonyms(Language.ARABIC,"جميل");
+        synonymResponse = reverso.getSynonyms(Language.ARABIC,"جميل");
 
         assertTrue(synonymResponse.isOK());
         assertNull(synonymResponse.getErrorMessage());
@@ -52,7 +54,7 @@ public class getSynonymsTest {
     }
     @Test
     void failedUnsupportedLanguageRequest(){
-        synonymResponse = Reverso.getSynonyms(Language.KOREAN,"아름다운");
+        synonymResponse = reverso.getSynonyms(Language.KOREAN,"아름다운");
 
         assertFalse(synonymResponse.isOK());
         assertNotNull(synonymResponse.getErrorMessage());
@@ -64,7 +66,7 @@ public class getSynonymsTest {
 
     @Test
     void failedNoResultsSynonymsRequest(){
-        synonymResponse = Reverso.getSynonyms(Language.GERMAN,"fhbbfbhsd1njdjcnf");
+        synonymResponse = reverso.getSynonyms(Language.GERMAN,"fhbbfbhsd1njdjcnf");
 
         assertFalse(synonymResponse.isOK());
         assertNotNull(synonymResponse.getErrorMessage());
