@@ -11,29 +11,30 @@ public abstract class Response {
 
     private String sourceLanguage;
 
-    private String text;
+    private String sourceText;
 
     private String errorMessage;
 
-    public Response(boolean isOK, String errorMessage, String sourceLanguage, String text) {
+    public Response(boolean isOK, String errorMessage, String sourceLanguage, String sourceText) {
         this.isOK = isOK;
         this.errorMessage = errorMessage;
         this.sourceLanguage = sourceLanguage;
-        this.text = text;
+        this.sourceText = sourceText;
     }
 
-    public Response(boolean isOK, String sourceLanguage, String text) {
+    public Response(boolean isOK, String sourceLanguage, String sourceText) {
         this.isOK = isOK;
         this.sourceLanguage = sourceLanguage;
-        this.text = text;
+        this.sourceText = sourceText;
         this.errorMessage=null;
     }
+
     public String toJson() {
         Map<String, Object> jsonMap = new LinkedHashMap<>();
         jsonMap.put("isOK", isOK());
         jsonMap.put("errorMessage", getErrorMessage());
         jsonMap.put("sourceLanguage", getSourceLanguage());
-        jsonMap.put("text", getText());
+        jsonMap.put("sourceText", getSourceText());
         addCustomFields(jsonMap);
         return new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(jsonMap);
     }
@@ -56,12 +57,12 @@ public abstract class Response {
         this.errorMessage = errorMessage;
     }
 
-    public String getText() {
-        return text;
+    public String getSourceText() {
+        return sourceText;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setSourceText(String sourceText) {
+        this.sourceText = sourceText;
     }
 
     public String getSourceLanguage() {
@@ -77,7 +78,7 @@ public abstract class Response {
         return "{\n" +
                 "  \"isOK\": " + isOK + ",\n" +
                 "  \"sourceLanguage\": \"" + sourceLanguage + "\",\n" +
-                "  \"text\": \"" + text + "\",\n" +
+                "  \"sourceText\": \"" + sourceText + "\",\n" +
                 "  \"errorMessage\": \"" + errorMessage + "\"\n" +
                 "}";
     }

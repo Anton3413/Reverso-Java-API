@@ -35,7 +35,7 @@ public class getContextTest {
 
         assertTrue(contextResponse.isOK());
         assertNull(contextResponse.getErrorMessage());
-        assertEquals(Language.ENGLISH.getFullName(),contextResponse.getSourceLanguage());
+        assertEquals(Language.ENGLISH.toString(),contextResponse.getSourceLanguage());
         assertNotNull(contextResponse.getContextResults());
         assertTrue(contextResponse.getContextResults().size()>15);
         assertTrue(contextResponse.getTranslations().length>5);
@@ -47,7 +47,7 @@ public class getContextTest {
 
         assertTrue(contextResponse.isOK());
         assertNull(contextResponse.getErrorMessage());
-        assertEquals(Language.ARABIC.getFullName(),contextResponse.getSourceLanguage());
+        assertEquals(Language.ARABIC.toString(),contextResponse.getSourceLanguage());
         assertNotNull(contextResponse.getContextResults());
         assertTrue(contextResponse.getContextResults().size()>15);
         assertTrue(contextResponse.getTranslations().length>5);
@@ -59,7 +59,7 @@ public class getContextTest {
 
         assertFalse(contextResponse.isOK());
         assertNotNull(contextResponse.getErrorMessage());
-        assertEquals(Language.UKRAINIAN.getFullName(),contextResponse.getTargetLanguage());
+        assertEquals(Language.UKRAINIAN.toString(),contextResponse.getTargetLanguage());
         assertNull(contextResponse.getContextResults());
         assertEquals(properties.getProperty("message.error.context.UnsupportedLanguages"),
                 contextResponse.getErrorMessage());
@@ -71,7 +71,7 @@ public class getContextTest {
 
         assertFalse(contextResponse.isOK());
         assertNotNull(contextResponse.getErrorMessage());
-        assertEquals(Language.POLISH.getFullName(),contextResponse.getTargetLanguage());
+        assertEquals(Language.POLISH.toString(),contextResponse.getTargetLanguage());
         assertNull(contextResponse.getContextResults());
         assertNull(contextResponse.getTranslations());
         assertEquals(properties.getProperty("message.error.context.UnsupportedLanguages"),
@@ -84,7 +84,7 @@ public class getContextTest {
 
         assertFalse(contextResponse.isOK());
         assertNotNull(contextResponse.getErrorMessage());
-        assertEquals(Language.RUSSIAN.getFullName(),contextResponse.getTargetLanguage());
+        assertEquals(Language.RUSSIAN.toString(),contextResponse.getTargetLanguage());
         assertNull(contextResponse.getContextResults());
         assertNull(contextResponse.getTranslations());
         assertEquals(properties.getProperty("message.error.context.noResults"),

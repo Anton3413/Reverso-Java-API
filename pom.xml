@@ -11,7 +11,7 @@
 
     <name>Reverso API</name>
     <description>Utilize our API wrapper to perform contextual translations,
-        find synonyms, voice text, conjugate verbs, and much more.</description>
+        find synonyms, voice sourceText, conjugate verbs, and much more.</description>
     <url>https://github.com/Anton3413/Reverso-Java-API</url>
 
     <licenses>

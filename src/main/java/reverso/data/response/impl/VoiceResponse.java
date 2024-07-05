@@ -69,11 +69,10 @@ public class VoiceResponse extends Response {
         return "{\n" +
                 "  \"isOK\": " + isOK() + ",\n" +
                 "  \"sourceLanguage\": \"" + getSourceLanguage() + "\",\n" +
-                "  \"text\": \"" + getText() + "\",\n" +
+                "  \"text\": \"" + getSourceText() + "\",\n" +
                 "  \"errorMessage\": \"" + getErrorMessage() + "\",\n" +
                 "  \"voiceName\": \"" + voiceName + "\",\n" +
                 "  \"voiceGender\": \"" + voiceGender + "\",\n" +
-                "  \"mp3DataBase64\": \"" + (mp3Data!=null) + "\"\n" +
                 "}";
     }
 

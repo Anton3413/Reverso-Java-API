@@ -3,7 +3,7 @@
 ![logotype](https://i.imgur.com/Mxbpi3N.jpeg)
 
 Java API wrapper to perform contextual translations, 
- find synonyms, voice text, conjugate verbs, and much more.
+ find synonyms, voice sourceText, conjugate verbs, and much more.
 
 Unfortunately,  complete information about the
 services used by Reverso is not available, though some are known.
@@ -34,7 +34,7 @@ public abstract class Response {
 
     private String sourceLanguage;
 
-    private String text;
+    private String sourceText;
 
     private String errorMessage;
     
@@ -55,30 +55,29 @@ translation or synonym search. It is represented as an **enum** with a
 list of all supported languages.
 ```java
 public enum Language {
-ARABIC("arabic", "ar", "ara", true),
-GERMAN("german", "de", "ger", true),
-ENGLISH("english", "en", "eng", true);
+    ARABIC("ar", true, null),
+    GERMAN("de", true, null),
+    ENGLISH("en", true, "eng"),
 }
 ```
 Each object in this enumeration has fields that help determine whether
 a specific language is supported for a given functionality. The fields 
 are arranged in the following sequence:
 
-1) `String fullName` <br>
-2) `String synonymName` <br>
-3) `String translateName` <br>
-4) `boolean conjugate`
+1) `String synonymName` <br>
+2) `boolean isConjugate` <br>
+3) `String spellCheckName`
 
 If any of these fields are false or null, it indicates that the language
 does not support the respective functionality.
 
 For example:
 ```java
-KOREAN("korean", null, "kor", false); 
+JAPANESE("ja", true, null);
 ```
-Since the second and fourth fields are **null** and **false**, 
-respectively, this means that **synonym** search and verb 
-**conjugation** are not available for *korean* language.
+
+The third field is null, this means that **spellCheck** are not available
+for *japanese* language.
 
 ## Usage
 The fundamental class, **Reverso**, manages all interactions with the API.
@@ -111,7 +110,7 @@ Here's the output :
 {
 "isOK": true,
 "sourceLanguage": "english",
-"text": "world",
+"sourceText": "world",
 "errorMessage": "null",
 "synonyms": {
 "Noun": [
@@ -130,7 +129,7 @@ arguments, such as the translation method, which is logical.
 ## getVoiceStream
 However, there is a method that differs slightly from the others:
 
-`VoiceResponse getVoiceStream(Voice voice, String text)`
+`VoiceResponse getVoiceStream(Voice voice, String sourceText)`
 
 For this method, you should pass one of the objects from the Voice enum. 
 The names of the objects and their fields can tell us the language they
@@ -145,7 +144,7 @@ GERMAN_ANDREAS("Andreas22k", "German", "M"),
 }
 ```
 Among other information, the VoiceResponse contains a byte array that 
-stores the audio file, which voices the required text. To get the audio 
+stores the audio file, which voices the required sourceText. To get the audio 
 data, you can use the following code:
 ```java
 Reverso reverso = new Reverso();
@@ -169,7 +168,7 @@ Here's an example of a successful response:
 {
 "isOK": true,
 "sourceLanguage": "english",
-"text": "hello",
+"sourceText": "hello",
 "targetLanguage": "russian",
 "translation": "привет",
 "contextTranslations": {
@@ -211,7 +210,7 @@ And console output:
 "isOK": false,
 "errorMessage": "Synonyms cannot be obtained for this language. A list of available languages can be found here: https://synonyms.reverso.net/synonym/",
 "sourceLanguage": "swedish",
-"text": "Skön"
+"sourceText": "Skön"
 }
 ```
 ## Credits

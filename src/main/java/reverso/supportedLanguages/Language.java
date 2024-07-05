@@ -1,47 +1,47 @@
 package reverso.supportedLanguages;
 
 public enum Language {
-    ARABIC("arabic", "ar","ara",true),
-    GERMAN("german", "de","ger",true),
-    ENGLISH("english", "en","eng",true),
-    SPANISH("spanish", "es","spa",true),
-    FRENCH("french", "fr","fra",true),
-    HEBREW("hebrew", "he","heb",true),
-    ITALIAN("italian", "it","ita",true),
-    JAPANESE("japanese", "ja","jpn",true),
-    KOREAN("korean", null,"kor",false),
-    DUTCH("dutch", "nl","dut",false),
-    POLISH("polish", "pl","pol",false),
-    PORTUGUESE("portuguese", "pt","por",true),
-    ROMANIAN("romanian", "ro","rum",false),
-    RUSSIAN("russian", "ru","rus",true),
-    SWEDISH("swedish", null,"swe",false),
-    TURKISH("turkish", null,"tur",false),
-    UKRAINIAN("ukrainian",null,null,false);
+    ARABIC("ar", true, null),
+    GERMAN("de", true, null),
+    ENGLISH("en", true, "eng"),
+    SPANISH("es", true, "spa"),
+    FRENCH("fr", true, "fra"),
+    HEBREW("he", true, null),
+    ITALIAN("it", true, "ita"),
+    JAPANESE("ja", true, null),
+    KOREAN(null, false, null),
+    DUTCH("nl", false, null),
+    POLISH("pl", false, null),
+    PORTUGUESE("pt", true, null),
+    ROMANIAN("ro", false, null),
+    RUSSIAN("ru", true, null),
+    SWEDISH(null, false, null),
+    TURKISH(null, false, null),
+    UKRAINIAN(null, false, null);
 
-    Language(String fullName, String synonymName,String translateName, boolean conjugate){
-        this.fullName = fullName;
+    private final String synonymName;
+    private final boolean isConjugate;
+    private final String spellCheckName;
+
+    Language(String synonymName, boolean isConjugate, String spellCheckName) {
         this.synonymName = synonymName;
-        this.translateName = translateName;
-        this.conjugate = conjugate;
+        this.isConjugate = isConjugate;
+        this.spellCheckName = spellCheckName;
     }
 
-    private final String fullName;
-    private final String synonymName;
-    private final String translateName;
-    private final boolean conjugate;
+    public String toString(){
+        return this.name().toLowerCase();
+    }
 
     public String getSynonymName() {
         return this.synonymName;
     }
-    public String getFullName() {
-        return this.fullName;
-    }
-    public String getTranslateName() {
-        return this.translateName;
-    }
 
     public boolean isConjugate() {
-        return conjugate;
+        return isConjugate;
+    }
+
+    public String getSpellCheckName() {
+        return spellCheckName;
     }
 }

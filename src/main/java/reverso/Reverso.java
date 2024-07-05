@@ -1,9 +1,12 @@
 package reverso;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import reverso.data.parser.HtmlParser;
+import reverso.data.request.SpellCheckRequest;
 import reverso.data.response.impl.*;
 import reverso.supportedLanguages.Language;
 import reverso.supportedLanguages.Voice;
@@ -17,6 +20,7 @@ public class Reverso {
     private static final String CONTEXT_URL = "https://context.reverso.net/translation/";
     private static final String VOICE_URL = "https://voice.reverso.net/RestPronunciation.svc/v1/output=json/GetVoiceStream/";
     private static final String CONJUGATION_URL = "https://conjugator.reverso.net/conjugation";
+    private static final String SPELLCHECK_URL = "https://orthographe.reverso.net/api/v1/Spelling";
 
     {
         initializeProperties();
@@ -26,7 +30,7 @@ public class Reverso {
     public SynonymResponse getSynonyms(Language language, String word) {
         if (language.getSynonymName() == null) {
             String errorMessage = properties.getProperty("message.error.synonym.unSupportedLanguage");
-            return new SynonymResponse(false, errorMessage, language.getFullName(), word);
+            return new SynonymResponse(false, errorMessage, language.toString(), word);
         }
         String URL = SYNONYM_URL + language.getSynonymName() + "/" + word;
 
@@ -38,30 +42,30 @@ public class Reverso {
                     .execute();
         } catch (IOException e) {
             String errorMessage = properties.getProperty("message.error.connection");
-            return new SynonymResponse(false, errorMessage, language.getFullName(), word);
+            return new SynonymResponse(false, errorMessage, language.toString(), word);
         }
         if (response.statusCode() == 404) {
             String errorMessage = properties.getProperty("message.error.synonym.noResults");
-            return new SynonymResponse(false, errorMessage, language.getFullName(), word);
+            return new SynonymResponse(false, errorMessage, language.toString(), word);
         }
         synonymsMap = parser.parseSynonymsPage(response);
         if (synonymsMap.isEmpty()) {
             String message = properties.getProperty("message.error.synonym.noResults");
-            return new SynonymResponse(false, message, language.getFullName(), word);
+            return new SynonymResponse(false, message, language.toString(), word);
         }
-        return new SynonymResponse(true, language.getFullName(), word, synonymsMap);
+        return new SynonymResponse(true, language.toString(), word, synonymsMap);
     }
 
     public ContextResponse getContext(Language sourceLanguage, Language targetLanguage, String word) {
 
-        ContextResponse contextResponse = new ContextResponse(false, null, sourceLanguage.getFullName(),
-                targetLanguage.getFullName(), word);
+        ContextResponse contextResponse = new ContextResponse(false, null, sourceLanguage.toString(),
+                targetLanguage.toString(), word);
 
         if (sourceLanguage.equals(targetLanguage)) {
             contextResponse.setErrorMessage(properties.getProperty("message.error.context.sameLanguage"));
             return contextResponse;
         }
-        String URL = CONTEXT_URL + sourceLanguage.getFullName() + "-" + targetLanguage.getFullName() + "/" + word;
+        String URL = CONTEXT_URL + sourceLanguage.toString() + "-" + targetLanguage.toString() + "/" + word;
 
         Document document;
         Map<String, String> contextMap;
@@ -127,13 +131,13 @@ public class Reverso {
 
     public ConjugationResponse getWordConjugation(Language language, String word) {
 
-        ConjugationResponse conjugationResponse = new ConjugationResponse(false, null, language.getFullName(), word);
+        ConjugationResponse conjugationResponse = new ConjugationResponse(false, null, language.toString(), word);
 
         if (!language.isConjugate()) {
             conjugationResponse.setErrorMessage(properties.getProperty("message.error.conjugation.invalidLanguage"));
             return conjugationResponse;
         }
-        String URL = CONJUGATION_URL + "-" + language.getFullName() + "-" + "verb" + "-" + word + ".html";
+        String URL = CONJUGATION_URL + "-" + language.toString() + "-" + "verb" + "-" + word + ".html";
 
         Map<String, String[]> conjugationData;
         Connection.Response response;
@@ -155,6 +159,44 @@ public class Reverso {
         conjugationResponse.setConjugationData(conjugationData);
         conjugationResponse.setOK(true);
         return conjugationResponse;
+    }
+    public SpellCheckResponse getSpellCheck(Language language, String text) {
+
+        if (language.getSpellCheckName() == null) {
+            return new SpellCheckResponse(false, properties.getProperty("message.error.spellCheck.unsupportedLanguage"),
+                    language.toString(), text);
+        }
+
+        String requestJson = SpellCheckRequest.builder().withLanguage(language.getSpellCheckName())
+                .withText(text)
+                .withCorrectionDetails(false)
+                .toJson();
+
+        Connection.Response response;
+        String responseData;
+        try {
+            response = Jsoup.connect(SPELLCHECK_URL)
+                    .header("Content-Type", "application/json")
+                    .ignoreContentType(true)
+                    .ignoreHttpErrors(true)
+                    .requestBody(requestJson)
+                    .method(Connection.Method.POST)
+                    .execute();
+            responseData = response.body();
+        } catch (IOException e) {
+            return new SpellCheckResponse(false, properties.getProperty("message.error.connection"), language.toString(), text);
+        }
+        SpellCheckResponse spellCheckResponse = new Gson().fromJson(responseData, SpellCheckResponse.class);
+
+        if (spellCheckResponse.getCorrectedText().equals(text)) {
+            return new SpellCheckResponse(false, properties.getProperty("message.error.spellCheck.noErrorsOrMismatchedLanguage"),
+                    language.toString(), text);
+        }
+            spellCheckResponse.setOK(true);
+            spellCheckResponse.setSourceText(text);
+            spellCheckResponse.setSourceLanguage(language.toString());
+
+            return spellCheckResponse;
     }
 
     private void initializeProperties() {

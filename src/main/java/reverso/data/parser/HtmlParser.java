@@ -93,7 +93,6 @@ public class HtmlParser {
                 if (childElement.tagName().equals("em")) {
                     sb.append("<em>").append(childElement.html()).append("</em>");
                 } else {
-                    // Recursively handle nested elements
                     sb.append(extractTextWithEmphasis(childElement));
                 }
             }

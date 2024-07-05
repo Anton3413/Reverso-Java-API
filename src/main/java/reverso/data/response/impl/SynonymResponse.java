@@ -34,7 +34,7 @@ public class SynonymResponse extends Response {
         return "{\n" +
                 "  \"isOK\": " + isOK() + ",\n" +
                 "  \"sourceLanguage\": \"" + getSourceLanguage() + "\",\n" +
-                "  \"text\": \"" + getText() + "\",\n" +
+                "  \"text\": \"" + getSourceText() + "\",\n" +
                 "  \"errorMessage\": \"" + getErrorMessage() + "\",\n" +
                 "  \"synonyms\": " + synonyms + "\n" +
                 "}";
