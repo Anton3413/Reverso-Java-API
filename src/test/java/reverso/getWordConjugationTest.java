@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import reverso.data.response.impl.ConjugationResponse;
-import reverso.supportedLanguages.Language;
+import reverso.language.Language;
 
 import java.io.IOException;
 import java.util.Properties;

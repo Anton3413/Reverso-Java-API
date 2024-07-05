@@ -1,4 +1,4 @@
-package reverso.supportedLanguages;
+package reverso.language;
 
 public enum Language {
     ARABIC("ar", true, null),

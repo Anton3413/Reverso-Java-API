@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import reverso.data.response.impl.SpellCheckResponse;
-import reverso.supportedLanguages.Language;
+import reverso.language.Language;
 import static org.junit.jupiter.api.Assertions.*;
 import java.io.IOException;
 import java.util.Properties;
@@ -34,7 +34,7 @@ public class getSpellCheck {
     }
 
     @Test
-    void SuccessEnglishSpellCheckRequest() {
+    void successEnglishSpellCheckRequest() {
 
         String englishText = "here ve have errores, we shuld to fix et";
         SpellCheckResponse response = reverso.getSpellCheck(Language.ENGLISH,englishText);
@@ -44,6 +44,42 @@ public class getSpellCheck {
         assertNotNull(response.getCorrectedText());
         assertNotEquals(englishText, response.getCorrectedText());
         assertNotNull(response.getStats());
+    }
+
+    @Test
+    void successFrenchSpellCheckRequest() {
+
+        String frenchText = "Je sui arivé a l'otel en Paris, é j'aim bocoup moin la vil.";
+
+        SpellCheckResponse response = reverso.getSpellCheck(Language.FRENCH,frenchText);
+
+        assertTrue(response.isOK());
+        assertNull(response.getErrorMessage());
+        assertNotNull(response.getCorrectedText());
+        assertNotEquals(frenchText, response.getCorrectedText());
+        assertNotNull(response.getStats());
+    }
+
+
+    @Test
+    void failedUnsupportedRussianSpellCheckRequest() {
+
+        SpellCheckResponse response = reverso.getSpellCheck(Language.RUSSIAN,"good luck");
+
+        assertFalse(response.isOK());
+        assertNotNull(response.getErrorMessage());
+        assertEquals(properties.getProperty("message.error.spellCheck.unsupportedLanguage"), response.getErrorMessage());
+        assertNull(response.getCorrectedText());
+    }
+
+    @Test
+    void failedNoMistakesOnTextSpellCheckRequest() {
+
+        SpellCheckResponse response = reverso.getSpellCheck(Language.SPANISH,"hola");
+
+        assertFalse(response.isOK());
+        assertNotNull(response.getErrorMessage());
+        assertEquals(properties.getProperty("message.error.spellCheck.noErrorsOrMismatchedLanguage"), response.getErrorMessage());
     }
 
     @AfterEach

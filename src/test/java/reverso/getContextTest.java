@@ -2,7 +2,7 @@ package reverso;
 
 import org.junit.jupiter.api.*;
 import reverso.data.response.impl.ContextResponse;
-import reverso.supportedLanguages.Language;
+import reverso.language.Language;
 
 import java.io.IOException;
 import java.util.Properties;

@@ -1,15 +1,15 @@
 package reverso;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import reverso.data.parser.HtmlParser;
+import reverso.data.request.RandomUserAgent;
 import reverso.data.request.SpellCheckRequest;
 import reverso.data.response.impl.*;
-import reverso.supportedLanguages.Language;
-import reverso.supportedLanguages.Voice;
+import reverso.language.Language;
+import reverso.language.Voice;
 import java.io.IOException;
 import java.util.*;
 
@@ -38,6 +38,7 @@ public class Reverso {
         Connection.Response response;
         try {
             response = Jsoup.connect(URL)
+                    .header("User-Agent", RandomUserAgent.getRandomUserAgent())
                     .ignoreHttpErrors(true)
                     .execute();
         } catch (IOException e) {
@@ -65,7 +66,7 @@ public class Reverso {
             contextResponse.setErrorMessage(properties.getProperty("message.error.context.sameLanguage"));
             return contextResponse;
         }
-        String URL = CONTEXT_URL + sourceLanguage.toString() + "-" + targetLanguage.toString() + "/" + word;
+        String URL = CONTEXT_URL + sourceLanguage + "-" + targetLanguage + "/" + word;
 
         Document document;
         Map<String, String> contextMap;
@@ -73,6 +74,7 @@ public class Reverso {
         Connection.Response response;
         try {
             response = Jsoup.connect(URL)
+                    .header("User-Agent", RandomUserAgent.getRandomUserAgent())
                     .ignoreHttpErrors(true)
                     .execute();
             document = response.parse();
@@ -107,6 +109,7 @@ public class Reverso {
         Connection.Response response;
         try {
             response = Jsoup.connect(requestURL)
+                    .header("User-Agent", RandomUserAgent.getRandomUserAgent())
                     .ignoreContentType(true)
                     .ignoreHttpErrors(true)
                     .execute();
@@ -143,6 +146,7 @@ public class Reverso {
         Connection.Response response;
         try {
             response = Jsoup.connect(URL)
+                    .header("User-Agent", RandomUserAgent.getRandomUserAgent())
                     .ignoreContentType(true)
                     .ignoreHttpErrors(true)
                     .execute();
@@ -177,6 +181,7 @@ public class Reverso {
         try {
             response = Jsoup.connect(SPELLCHECK_URL)
                     .header("Content-Type", "application/json")
+                    .header("User-Agent", RandomUserAgent.getRandomUserAgent())
                     .ignoreContentType(true)
                     .ignoreHttpErrors(true)
                     .requestBody(requestJson)

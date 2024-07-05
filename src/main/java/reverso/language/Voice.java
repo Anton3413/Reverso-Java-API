@@ -1,4 +1,4 @@
-package reverso.supportedLanguages;
+package reverso.language;
 
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
