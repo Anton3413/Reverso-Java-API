@@ -217,3 +217,4 @@ And console output:
 
 -   All data is provided by [reverso.net](https://reverso.net)
 -   Author on Telegram [@bondar852](https://t.me/bondar852)
+-   RandomUserAgent.class author [mkstayalive](https://github.com/mkstayalive/random-user-agent-java)
