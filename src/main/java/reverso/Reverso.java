@@ -56,7 +56,6 @@ public class Reverso {
         }
         return new SynonymResponse(true, language.toString(), word, synonymsMap);
     }
-
     public ContextResponse getContext(Language sourceLanguage, Language targetLanguage, String word) {
 
         ContextResponse contextResponse = new ContextResponse(false, null, sourceLanguage.toString(),
