@@ -34,7 +34,7 @@ public class getWordConjugationTest {
     }
 
     @Test
-    void SuccessEnglishConjugationRequest(){
+    void SuccessGermanConjugationRequest(){
         conjugationResponse = reverso.getWordConjugation(Language.GERMAN,"haben");
 
         assertTrue(conjugationResponse.isOK());

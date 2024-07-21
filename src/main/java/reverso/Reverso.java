@@ -140,7 +140,7 @@ public class Reverso {
             conjugationResponse.setErrorMessage(properties.getProperty("message.error.conjugation.invalidLanguage"));
             return conjugationResponse;
         }
-        String URL = CONJUGATION_URL + "-" + language.toString() + "-" + "verb" + "-" + word + ".html";
+        String URL = CONJUGATION_URL + "-" + language + "-" + "verb" + "-" + word + ".html";
 
         Map<String, String[]> conjugationData;
         Connection.Response response;
