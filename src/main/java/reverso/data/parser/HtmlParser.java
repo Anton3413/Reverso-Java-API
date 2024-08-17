@@ -91,7 +91,7 @@ public class HtmlParser {
             } else if (child instanceof Element) {
                 Element childElement = (Element) child;
                 if (childElement.tagName().equals("em")) {
-                    sb.append("<em>").append(childElement.html()).append("</em>");
+                    sb.append("<b>").append(childElement.html()).append("</b>");
                 } else {
                     sb.append(extractTextWithEmphasis(childElement));
                 }

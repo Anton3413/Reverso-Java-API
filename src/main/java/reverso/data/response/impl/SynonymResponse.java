@@ -29,14 +29,20 @@ public class SynonymResponse extends Response {
         this.synonyms = synonyms;
     }
 
-    @Override
-    public String toString() {
-        return "{\n" +
-                "  \"isOK\": " + isOK() + ",\n" +
-                "  \"sourceLanguage\": \"" + getSourceLanguage() + "\",\n" +
-                "  \"text\": \"" + getSourceText() + "\",\n" +
-                "  \"errorMessage\": \"" + getErrorMessage() + "\",\n" +
-                "  \"synonyms\": " + synonyms + "\n" +
-                "}";
+    public String getSynonymsAsString() {
+        StringBuilder builder = new StringBuilder();
+
+        for (Map.Entry<String, List<String>> entry : synonyms.entrySet()) {
+            String key = entry.getKey();
+            List<String> values = entry.getValue();
+
+            builder.append("**").append(key).append("**:\n");
+
+            for (String value : values) {
+                builder.append("- ").append(value).append("\n");
+            }
+            builder.append("\n");
+        }
+        return builder.toString();
     }
 }

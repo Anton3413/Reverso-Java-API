@@ -30,7 +30,7 @@ public class SpellCheckResponse extends Response {
         jsonMap.put("stats", stats);
     }
 
-    public String getCorrectedText() {
+    public String getCorrectedTextAsString() {
         return correctedText;
     }
 
@@ -61,4 +61,5 @@ public class SpellCheckResponse extends Response {
     public void setStats(Stats stats) {
         this.stats = stats;
     }
+
 }

@@ -73,13 +73,4 @@ public abstract class Response {
         this.sourceLanguage = sourceLanguage;
     }
 
-    @Override
-    public String toString() {
-        return "{\n" +
-                "  \"isOK\": " + isOK + ",\n" +
-                "  \"sourceLanguage\": \"" + sourceLanguage + "\",\n" +
-                "  \"sourceText\": \"" + sourceText + "\",\n" +
-                "  \"errorMessage\": \"" + errorMessage + "\"\n" +
-                "}";
-    }
 }

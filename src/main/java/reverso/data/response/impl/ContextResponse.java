@@ -56,4 +56,19 @@ public class ContextResponse extends Response {
     public void setTranslations(String[] translations) {
         this.translations = translations;
     }
+
+    public String getContextAsString(){
+        StringBuilder builder = new StringBuilder();
+
+        this.contextResults.forEach((key, value) -> builder.append(key).append(": ").append(value).append("\n"));
+        return builder.toString();
+    }
+
+    public String getTranslationsAsString(){
+        StringBuilder builder = new StringBuilder();
+        for (String element : translations) {
+            builder.append("- ").append(element).append("\n");
+        }
+        return builder.toString();
+    }
 }

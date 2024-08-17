@@ -64,16 +64,4 @@ public class VoiceResponse extends Response {
         jsonMap.put("voiceGender", voiceGender);
     }
 
-    @Override
-    public String toString() {
-        return "{\n" +
-                "  \"isOK\": " + isOK() + ",\n" +
-                "  \"sourceLanguage\": \"" + getSourceLanguage() + "\",\n" +
-                "  \"text\": \"" + getSourceText() + "\",\n" +
-                "  \"errorMessage\": \"" + getErrorMessage() + "\",\n" +
-                "  \"voiceName\": \"" + voiceName + "\",\n" +
-                "  \"voiceGender\": \"" + voiceGender + "\",\n" +
-                "}";
-    }
-
 }
