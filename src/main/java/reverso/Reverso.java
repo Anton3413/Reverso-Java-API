@@ -193,7 +193,7 @@ public class Reverso {
         }
         SpellCheckResponse spellCheckResponse = new Gson().fromJson(responseData, SpellCheckResponse.class);
 
-        if (spellCheckResponse.getCorrectedText().equals(text)) {
+        if (spellCheckResponse.getCorrectedTextAsString().equals(text)) {
             return new SpellCheckResponse(false, properties.getProperty("message.error.spellCheck.noErrorsOrMismatchedLanguage"),
                     language.toString(), text);
         }
