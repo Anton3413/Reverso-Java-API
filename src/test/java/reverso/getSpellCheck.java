@@ -41,8 +41,8 @@ public class getSpellCheck {
 
         assertTrue(response.isOK());
         assertNull(response.getErrorMessage());
-        assertNotNull(response.getCorrectedText());
-        assertNotEquals(englishText, response.getCorrectedText());
+        assertNotNull(response.getCorrectedTextAsString());
+        assertNotEquals(englishText, response.getCorrectedTextAsString());
         assertNotNull(response.getStats());
     }
 
@@ -55,8 +55,8 @@ public class getSpellCheck {
 
         assertTrue(response.isOK());
         assertNull(response.getErrorMessage());
-        assertNotNull(response.getCorrectedText());
-        assertNotEquals(frenchText, response.getCorrectedText());
+        assertNotNull(response.getCorrectedTextAsString());
+        assertNotEquals(frenchText, response.getCorrectedTextAsString());
         assertNotNull(response.getStats());
     }
 
@@ -69,7 +69,7 @@ public class getSpellCheck {
         assertFalse(response.isOK());
         assertNotNull(response.getErrorMessage());
         assertEquals(properties.getProperty("message.error.spellCheck.unsupportedLanguage"), response.getErrorMessage());
-        assertNull(response.getCorrectedText());
+        assertNull(response.getCorrectedTextAsString());
     }
 
     @Test

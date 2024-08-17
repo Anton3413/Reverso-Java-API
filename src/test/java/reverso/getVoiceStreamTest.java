@@ -37,28 +37,6 @@ class getVoiceStreamTest {
         assertNull(voiceResponse.getErrorMessage());
         assertNotNull(voiceResponse.getMp3Data());
     }
-
-   /* @Test
-    void successRussianRequest(){
-        voiceResponse = reverso.getVoiceStream(Voice.RUSSIAN_ALYONA,
-                "Ни за что на свете не держитесь за слово 'никогда'.");
-        assertTrue(voiceResponse.isOK());
-        assertEquals(Voice.RUSSIAN_ALYONA.getLanguage(), voiceResponse.getSourceLanguage());
-        assertDoesNotThrow(() ->voiceResponse.getAudioAsBase64());
-        assertNull(voiceResponse.getErrorMessage());
-        assertNotNull(voiceResponse.getMp3Data());
-    }
-    @Test
-    void successFrenchRequest(){
-        voiceResponse = reverso.getVoiceStream(Voice.FRENCH_ANTOINE,
-                "Le temps passe vite quand on s'amuse.");
-        assertTrue(voiceResponse.isOK());
-        assertEquals(Voice.FRENCH_ANTOINE.getLanguage(), voiceResponse.getSourceLanguage());
-        assertDoesNotThrow(() ->voiceResponse.getAudioAsBase64());
-        assertNull(voiceResponse.getErrorMessage());
-        assertNotNull(voiceResponse.getMp3Data());
-    }*/
-
     @Test
     void failureDifferentVoiceAndTextRequest(){
         voiceResponse = reverso.getVoiceStream(Voice.ARABIC_LEILA,"你好！");
