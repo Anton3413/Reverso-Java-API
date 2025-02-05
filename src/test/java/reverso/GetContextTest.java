@@ -11,8 +11,8 @@ import java.util.logging.Logger;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class getContextTest {
-    private final Logger logger = Logger.getLogger(getVoiceStreamTest.class.getName());
+public class GetContextTest {
+    private final Logger logger = Logger.getLogger(GetVoiceStreamTest.class.getName());
 
     Reverso reverso;
     ContextResponse contextResponse;

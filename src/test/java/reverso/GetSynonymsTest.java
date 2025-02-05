@@ -14,8 +14,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class getSynonymsTest {
-    private final Logger logger = Logger.getLogger(getVoiceStreamTest.class.getName());
+public class GetSynonymsTest {
+    private final Logger logger = Logger.getLogger(GetVoiceStreamTest.class.getName());
 
     Reverso reverso;
     SynonymResponse synonymResponse;

@@ -15,9 +15,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class getWordConjugationTest {
+public class GetWordConjugationTest {
 
-    private final Logger logger = Logger.getLogger(getVoiceStreamTest.class.getName());
+    private final Logger logger = Logger.getLogger(GetVoiceStreamTest.class.getName());
     Reverso reverso;
     ConjugationResponse conjugationResponse;
     Properties properties;

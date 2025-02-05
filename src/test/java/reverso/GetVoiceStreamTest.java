@@ -12,8 +12,8 @@ import java.util.logging.Level;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class getVoiceStreamTest {
-    private static final Logger logger = Logger.getLogger(getVoiceStreamTest.class.getName());
+class GetVoiceStreamTest {
+    private static final Logger logger = Logger.getLogger(GetVoiceStreamTest.class.getName());
     Reverso reverso;
     VoiceResponse voiceResponse;
     Properties properties;

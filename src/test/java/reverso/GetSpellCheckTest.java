@@ -13,9 +13,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class getSpellCheck {
+public class GetSpellCheckTest {
 
-    private final Logger logger = Logger.getLogger(getVoiceStreamTest.class.getName());
+    private final Logger logger = Logger.getLogger(GetVoiceStreamTest.class.getName());
 
     Reverso reverso;
     SpellCheckResponse spellCheckResponse;
