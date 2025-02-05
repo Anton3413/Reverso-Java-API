@@ -1,6 +1,6 @@
 # Reverso Java API
 
-![logotype](https://i.imgur.com/Mxbpi3N.jpeg)
+![logotype]((https://ibb.co/3mc7nJCk))
 
 Java API wrapper to perform contextual translations, 
  find synonyms, voice sourceText, conjugate verbs, and much more.
