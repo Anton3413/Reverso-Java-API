@@ -9,6 +9,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class GetContextTest {
@@ -27,6 +28,30 @@ public class GetContextTest {
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Error loading properties file", e);
         }
+    }
+
+    @Test
+    void successGermanSpanishContextRequest(){
+        contextResponse = reverso.getContext(Language.GERMAN,Language.SPANISH,"Wirtschaft");
+
+        assertTrue(contextResponse.isOK());
+        assertNull(contextResponse.getErrorMessage());
+        assertEquals(Language.GERMAN.toString(),contextResponse.getSourceLanguage());
+        assertNotNull(contextResponse.getContextResults());
+        assertTrue(contextResponse.getContextResults().size()>15);
+        assertTrue(contextResponse.getTranslations().length>5);
+    }
+
+    @Test
+    void successUkrainianFrenchContextRequest(){
+        contextResponse = reverso.getContext(Language.UKRAINIAN,Language.FRENCH,"небокрай");
+
+        assertTrue(contextResponse.isOK());
+        assertNull(contextResponse.getErrorMessage());
+        assertEquals(Language.UKRAINIAN.toString(),contextResponse.getSourceLanguage());
+        assertNotNull(contextResponse.getContextResults());
+        assertTrue(contextResponse.getContextResults().size()>15);
+        assertTrue(contextResponse.getTranslations().length>0);
     }
 
     @Test
@@ -54,7 +79,20 @@ public class GetContextTest {
     }
 
     @Test
-    void FailureUnsupportedKoreanUkrainianContextRequest(){
+    void failureUnsupportedKoreanArabicContextRequest(){
+        contextResponse = reverso.getContext(Language.KOREAN,Language.ARABIC,"ありがとう");
+
+        assertFalse(contextResponse.isOK());
+        assertNotNull(contextResponse.getErrorMessage());
+        assertEquals(Language.ARABIC.toString(),contextResponse.getTargetLanguage());
+        assertNull(contextResponse.getContextResults());
+        assertEquals(properties.getProperty("message.error.context.UnsupportedLanguages"),
+                contextResponse.getErrorMessage());
+    }
+
+
+    @Test
+    void failureUnsupportedKoreanUkrainianContextRequest(){
         contextResponse = reverso.getContext(Language.KOREAN,Language.UKRAINIAN,"красивий");
 
         assertFalse(contextResponse.isOK());
@@ -90,6 +128,19 @@ public class GetContextTest {
         assertEquals(properties.getProperty("message.error.context.noResults"),
                 contextResponse.getErrorMessage());
     }
+    @Test
+    void FailureIncorrectWordContextRequest2(){
+        contextResponse = reverso.getContext(Language.ITALIAN, Language.RUSSIAN,"someincorrectstringexample");
+
+        assertFalse(contextResponse.isOK());
+        assertNotNull(contextResponse.getErrorMessage());
+        assertEquals(Language.RUSSIAN.toString(),contextResponse.getTargetLanguage());
+        assertNull(contextResponse.getContextResults());
+        assertNull(contextResponse.getTranslations());
+        assertEquals(properties.getProperty("message.error.context.noResults"),
+                contextResponse.getErrorMessage());
+    }
+
     @Test
     void FailureSameLanguagesContextRequest(){
         contextResponse = reverso.getContext(Language.POLISH,Language.POLISH,"ja pierdole bobr");

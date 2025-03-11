@@ -18,7 +18,7 @@ public class GetSpellCheckTest {
     private final Logger logger = Logger.getLogger(GetVoiceStreamTest.class.getName());
 
     Reverso reverso;
-    SpellCheckResponse spellCheckResponse;
+    SpellCheckResponse response;
     Properties properties;
 
 
@@ -36,12 +36,11 @@ public class GetSpellCheckTest {
     @Test
     void successEnglishSpellCheckRequest() {
 
-        String englishText = "here ve have errores, we shuld to fix et";
-        SpellCheckResponse response = reverso.getSpellCheck(Language.ENGLISH,englishText);
+        String englishText = "here ve have errores, we shuld to fix et.";
+        response = reverso.getSpellCheck(Language.ENGLISH,englishText);
 
         assertTrue(response.isOK());
         assertNull(response.getErrorMessage());
-        assertNotNull(response.getCorrectedTextAsString());
         assertNotEquals(englishText, response.getCorrectedTextAsString());
         assertNotNull(response.getStats());
     }
@@ -51,20 +50,48 @@ public class GetSpellCheckTest {
 
         String frenchText = "Je sui arivé a l'otel en Paris, é j'aim bocoup moin la vil.";
 
-        SpellCheckResponse response = reverso.getSpellCheck(Language.FRENCH,frenchText);
+        response = reverso.getSpellCheck(Language.FRENCH,frenchText);
 
         assertTrue(response.isOK());
         assertNull(response.getErrorMessage());
-        assertNotNull(response.getCorrectedTextAsString());
         assertNotEquals(frenchText, response.getCorrectedTextAsString());
         assertNotNull(response.getStats());
+    }
+
+    @Test
+    void successEnglishSpellCheckRequest2(){
+        String englishText = "Yesterday I go to the market."+
+                "I buy some apple and a bottel of milk." +
+                "Then I meet my friend and we drink cofee together.";
+
+        response = reverso.getSpellCheck(Language.ENGLISH,englishText);
+
+        assertTrue(response.isOK());
+        assertNull(response.getErrorMessage());
+        assertNotEquals(englishText, response.getCorrectedTextAsString());
+        assertEquals(25,response.getStats().getWordCount());
+        assertEquals(response.getStats().toJson(),response.getStats().toString());
+    }
+
+    @Test
+    void successItalianSpellCheckRequest(){
+        String italianText = "Certto, eccomi!. " +
+                "Io amo mangiare piza con fromaggio.";
+
+        response = reverso.getSpellCheck(Language.ITALIAN,italianText);
+
+        assertTrue(response.isOK());
+        assertNull(response.getErrorMessage());
+        assertNotEquals(italianText, response.getCorrectedTextAsString());
+        assertTrue(response.getStats().getWordCount()>5);
+        assertEquals(response.getStats().toJson(),response.getStats().toString());
     }
 
 
     @Test
     void failedUnsupportedRussianSpellCheckRequest() {
 
-        SpellCheckResponse response = reverso.getSpellCheck(Language.RUSSIAN,"good luck");
+        response = reverso.getSpellCheck(Language.RUSSIAN,"good luck");
 
         assertFalse(response.isOK());
         assertNotNull(response.getErrorMessage());
@@ -73,9 +100,21 @@ public class GetSpellCheckTest {
     }
 
     @Test
-    void failedNoMistakesOnTextSpellCheckRequest() {
+    void failedUnsupportedSwedishSpellCheckRequest() {
 
-        SpellCheckResponse response = reverso.getSpellCheck(Language.SPANISH,"hola");
+        response = reverso.getSpellCheck(Language.SWEDISH,"Jag gilar att äta fisk och potatis");
+
+        assertFalse(response.isOK());
+        assertNotNull(response.getErrorMessage());
+        assertEquals(properties.getProperty("message.error.spellCheck.unsupportedLanguage"), response.getErrorMessage());
+        assertNull(response.getCorrectedTextAsString());
+        assertNull(response.getStats());
+    }
+
+    @Test
+    void failedSpanishNoMistakesOnTextSpellCheckRequest() {
+
+        response = reverso.getSpellCheck(Language.SPANISH,"hola");
 
         assertFalse(response.isOK());
         assertNotNull(response.getErrorMessage());
@@ -84,6 +123,17 @@ public class GetSpellCheckTest {
 
     @AfterEach
     void initializeInstance(){
-        spellCheckResponse = null;
+        response = null;
+    }
+
+    @Test
+    void failedUnsupportedArabicSpellCheckRequest() {
+
+        response = reverso.getSpellCheck(Language.RUSSIAN,"Я желать тебе крепкава здаровя");
+
+        assertFalse(response.isOK());
+        assertNotNull(response.getErrorMessage());
+        assertEquals(properties.getProperty("message.error.spellCheck.unsupportedLanguage"), response.getErrorMessage());
+        assertNull(response.getCorrectedTextAsString());
     }
 }

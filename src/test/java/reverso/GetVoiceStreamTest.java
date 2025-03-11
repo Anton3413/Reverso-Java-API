@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 

@@ -53,4 +53,8 @@ public class Stats {
     public String toJson(){
         return new Gson().toJson(this);
     }
+
+    public String toString(){
+        return toJson();
+    }
 }

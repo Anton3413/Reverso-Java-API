@@ -11,9 +11,14 @@ import reverso.data.response.impl.*;
 import reverso.language.Language;
 import reverso.language.Voice;
 import java.io.IOException;
-import java.util.*;
+import java.util.Base64;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 public class Reverso {
+
+    private String apiKey;
     private HtmlParser parser;
     private Properties properties;
     private static final String SYNONYM_URL = "https://synonyms.reverso.net/synonym/";
@@ -22,9 +27,13 @@ public class Reverso {
     private static final String CONJUGATION_URL = "https://conjugator.reverso.net/conjugation";
     private static final String SPELLCHECK_URL = "https://orthographe.reverso.net/api/v1/Spelling";
 
-    {
-        initializeProperties();
-        initializeParser(properties);
+    public Reverso(String apiKey){
+        initialize();
+        this.apiKey = apiKey;
+    }
+    public Reverso(){
+        initialize();
+        initializeAPIKey();
     }
 
     public SynonymResponse getSynonyms(Language language, String word) {
@@ -66,18 +75,31 @@ public class Reverso {
             contextResponse.setErrorMessage(properties.getProperty("message.error.context.sameLanguage"));
             return contextResponse;
         }
-        String URL = CONTEXT_URL + sourceLanguage + "-" + targetLanguage + "/" + word;
+        String contextURL = CONTEXT_URL + sourceLanguage + "-" + targetLanguage + "/" + word;
 
+        String APIURL = "https://api.zenrows.com/v1/?apikey=" + apiKey + "&url=" + contextURL + "&js_render=true" +
+                "&original_status=true";
         Document document;
         Map<String, String> contextMap;
         String[] translations;
         Connection.Response response;
         try {
-            response = Jsoup.connect(URL)
-                    .header("User-Agent", RandomUserAgent.getRandomUserAgent())
+            response = Jsoup.connect(APIURL)
                     .ignoreHttpErrors(true)
+                    .ignoreContentType(true)
+                    .followRedirects(false)
+                    .header("User-Agent",RandomUserAgent.getRandomUserAgent())
+                    .timeout(20000)
                     .execute();
-            document = response.parse();
+          if (response.statusCode() == 404) {
+                contextResponse.setErrorMessage(properties.getProperty("message.error.context.noResults"));
+                return contextResponse;
+          }
+          if(response.statusCode()== 401){
+                contextResponse.setErrorMessage(properties.getProperty("message.error.apikey.invalid"));
+          }
+          document = response.parse();
+
         } catch (IOException e) {
             contextResponse.setErrorMessage(properties.getProperty("message.error.connection"));
             return contextResponse;
@@ -87,17 +109,13 @@ public class Reverso {
             return contextResponse;
         }
         translations = parser.parseContextPageGetTranslations(document);
-        if (translations.length == 0) {
-            contextResponse.setErrorMessage(properties.getProperty("message.error.context.noResults"));
-            return contextResponse;
-        }
         contextMap = parser.parseContextPage(document);
 
         contextResponse.setContextResults(contextMap);
         contextResponse.setOK(true);
         contextResponse.setTranslations(translations);
         return contextResponse;
-    }
+        }
 
     public VoiceResponse getVoiceStream(Voice voice, String text) {
 
@@ -204,6 +222,11 @@ public class Reverso {
             return spellCheckResponse;
     }
 
+    private void initialize(){
+        initializeProperties();
+        initializeParser(properties);
+    }
+
     private void initializeProperties() {
         try {
             properties = new Properties();
@@ -215,6 +238,23 @@ public class Reverso {
 
     private void initializeParser(Properties properties){
         parser = new HtmlParser(properties);
+    }
+
+    private void initializeAPIKey() {
+        Properties properties = new Properties();
+        try {
+            properties.load(Reverso.class.getResourceAsStream("/apikey.properties"));
+            apiKey = properties.getProperty("apiKey");
+            validateAPIKey(apiKey);
+        } catch (IOException e) {
+            throw new RuntimeException(properties.getProperty("message.error.apikey.init"), e);
+
+        }
+    }
+    private void validateAPIKey(String apiKey) {
+        if (apiKey == null || apiKey.isBlank()) {
+            throw new RuntimeException(properties.getProperty("message.error.apikey.blank"));
+        }
     }
 }
 

@@ -38,7 +38,6 @@ public class GetSynonymsTest {
 
         assertTrue(synonymResponse.isOK());
         assertNull(synonymResponse.getErrorMessage());
-        assertNotNull(synonymResponse.getSynonyms());
         assertTrue(synonymResponse.getSynonyms().get("Adjective").size() > 10);
         assertTrue(synonymResponse.getSynonyms().get("Adjective").contains("fabuloso"));
     }
@@ -48,7 +47,6 @@ public class GetSynonymsTest {
 
         assertTrue(synonymResponse.isOK());
         assertNull(synonymResponse.getErrorMessage());
-        assertNotNull(synonymResponse.getSynonyms());
         assertTrue(synonymResponse.getSynonyms().get("Adjective").size() > 10);
         assertTrue(synonymResponse.getSynonyms().get("Adjective").contains("لطيف"));
     }

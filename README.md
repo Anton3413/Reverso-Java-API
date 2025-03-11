@@ -10,17 +10,38 @@ services used by Reverso is not available, though some are known.
 They work and behave differently, so our main goal was to create 
 a unified and simple API, the responses of which would have a clear 
 structure and behavior.
+
 ## Navigation
+- [How to use this library](#How-to-use)
 -   [Main components](#main-components)
     -   [Response](#response)
     -   [Language](#language)
 -   [Usage](#usage)
     -   [Standart workfolw](#standard-workflow)
     -   [getVoiceStream](#getvoicestream)
+    -   [getContext problems](#getcontext-problems)
 -   [Response status](#response-status)
     -   [Success](#success)
     -   [Failure](#failure)
 -   [Credits](#credits)
+
+## How to use
+**Recently, the [Context page](https://context.reverso.net/) started using Cloudflare
+protection. The solution to this was to use a third-party scraping API that
+utilizes a headless browser to bypass the protection (by executing JavaScript
+code on the page).**
+
+Since ZenRows was chosen as the third-party API, follow these simple steps to use it:
+
+Go to the [website](https://www.zenrows.com/) and complete a simple registration.
+- Answer a few questions during the initial registration (this part can be skipped).
+- Obtain an API key as part of the free trial period.
+- Insert it into the already created apikey.properties file in the format:
+  `apiKey=yourKey`
+- Everything is ready to use!
+
+P.S It is also worth mentioning that this key can be inserted into the constructor
+when creating a [Reverso object](#usage). However, the first option is preferable.
 
 ## Main components
 ### Response
@@ -58,6 +79,7 @@ public enum Language {
     ARABIC("ar", true, null),
     GERMAN("de", true, null),
     ENGLISH("en", true, "eng"),
+    ROMANIAN("ro", false, null)
 }
 ```
 Each object in this enumeration has fields that help determine whether
@@ -74,15 +96,18 @@ does not support the respective functionality.
 For example:
 ```java
 JAPANESE("ja", true, null);
+ROMANIAN("ro", false, null);
 ```
 
-The third field is null, this means that **spellCheck** are not available
-for *japanese* language.
+<i> Japanese </i> – Synonym search and verb conjugation are available, but spell check is not. <br>
+<i>Romanian </i> – Only synonyms are available. Verb conjugation and spell check are not available.
+And so on.
 
 ## Usage
 The fundamental class, **Reverso**, manages all interactions with the API.
-First, we need to create an instance of this class.
-## Standard workflow
+First, we need to create an instance of this class. As mentioned above, the API key can also
+be added to the class constructor, although this is not mandatory.
+### Standard workflow
 To retrieve the necessary data, we must call one of the methods 
 of this class.
 
@@ -126,7 +151,7 @@ Here's the output :
 Most methods are very similar,  some require two languages in their 
 arguments, such as the translation method, which is logical. 
 
-## getVoiceStream
+### getVoiceStream
 However, there is a method that differs slightly from the others:
 
 `VoiceResponse getVoiceStream(Voice voice, String sourceText)`
@@ -156,6 +181,13 @@ It should be noted that when serializing this object using the `toJson()`
 method, the *byte[] mp3Data* field is ignored. However, in this class, we
 can also get this field as a Base64 string by invoking 
 the `getAudioAsBase64()` method.
+
+### getContext problems
+
+Unfortunately, due to the use of a third-party API, the method may be unstable. The response
+time can take a while, which can sometimes be critical. This is because the API needs to process
+the request in a headless browser mode and execute the necessary JavaScripts, which has significantly 
+slowed it down. Also, we cannot predict the state of the third-party API servers at the time of use.
 
 ## Response status
 Each response object has a `boolean isOK` field, along with a 
