@@ -1,6 +1,6 @@
 # Reverso Java API
 
-[![photo_2024_06_26_17_27_41.jpg](https://i.postimg.cc/BZht53ZZ/photo_2024_06_26_17_27_41.jpg)](https://postimg.cc/PNwthB80)
+![logotype](https://i.ibb.co/JjmpmMh9/photo-2024-06-26-17-27-41.jpg)
 
 
 Java API wrapper to perform contextual translations, 
